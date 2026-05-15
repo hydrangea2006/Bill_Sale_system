@@ -1,0 +1,13 @@
+//
+// Created by ASUS on 2026/5/15.
+//
+
+#ifndef BILLANDSALE_SYSTEM_ADDRESS_CONTROLLOR_H
+#define BILLANDSALE_SYSTEM_ADDRESS_CONTROLLOR_H
+
+
+class address_controllor {
+};
+
+
+#endif //BILLANDSALE_SYSTEM_ADDRESS_CONTROLLOR_H

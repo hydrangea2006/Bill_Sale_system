@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginWidget</class>
+ <widget class="QWidget" name="LoginWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>413</width>
+    <height>313</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>登录</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="leftMargin">
+      <number>20</number>
+     </property>
+     <property name="topMargin">
+      <number>20</number>
+     </property>
+     <property name="rightMargin">
+      <number>20</number>
+     </property>
+     <property name="bottomMargin">
+      <number>20</number>
+     </property>
+     <property name="horizontalSpacing">
+      <number>15</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>18</number>
+     </property>
+     <item row="3" column="1">
+      <widget class="QPushButton" name="btn_register">
+       <property name="text">
+        <string>注册</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="btn_forgetPwd">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #f5f7fa;
+    color: #409eff;
+    border: 1px solid #409eff;
+    border-radius: 8px;
+    font-size: 11pt;
+}
+QPushButton:hover {
+    background-color: #e6f7ff;
+}</string>
+       </property>
+       <property name="text">
+        <string>忘记密码</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <family>Microsoft YaHei</family>
+         <pointsize>11</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #409eff;
+    color: white;
+    border-radius: 8px;
+    font-size: 11pt;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #66b1ff;
+}</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Shape::Panel</enum>
+       </property>
+       <property name="text">
+        <string>密码：</string>
+       </property>
+       <property name="indent">
+        <number>-3</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="btnLogin">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #409eff;
+    color: white;
+    border-radius: 8px;
+    font-size: 11pt;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #66b1ff;
+}</string>
+       </property>
+       <property name="text">
+        <string>登录</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <family>Microsoft YaHei</family>
+         <pointsize>11</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>用户名：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="leUsername">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11pt;
+    background-color: white;
+}
+QLineEdit:focus {
+    border: 1px solid #409eff;
+}</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lePassword">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11pt;
+    background-color: white;
+}
+QLineEdit:focus {
+    border: 1px solid #409eff;
+}</string>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::EchoMode::Password</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
