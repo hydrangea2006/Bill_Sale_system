@@ -4,6 +4,7 @@
 #include <QRandomGenerator>
 #include "login_controllor.h"
 #include "databasemanager.h"
+#include "module/inventory/inventorywidget.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,5 +20,10 @@ int main(int argc, char *argv[])
     login_controllor con;
     con.setView(&loginWidget);
     loginWidget.show();
+
+    // === 临时：直接显示库存界面===
+    InventoryWidget inventoryWidget;
+    inventoryWidget.show();
+
     return a.exec();
 }
