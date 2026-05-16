@@ -8,7 +8,7 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+set(CMAKE_PREFIX_PATH "E:/MysoftWare/Qt/6.10.2/mingw_64" ${CMAKE_PREFIX_PATH})
 find_package(Qt6 REQUIRED COMPONENTS Widgets Sql)
 
 set(PROJECT_SOURCES
@@ -26,6 +26,8 @@ set(PROJECT_SOURCES
         src/common/hashsha.h
         src/common/user.cpp
         src/common/user.h
+        src/common/goods.cpp      # 新增
+        src/common/goods.h        # 新增
 
         # Login 模块 (View & Controller)
         src/module/login/login_controllor.cpp
@@ -45,6 +47,8 @@ set(PROJECT_SOURCES
         src/module/deduct/deduct_controllor.h
         src/module/inventory/inventory_controllor.cpp
         src/module/inventory/inventory_controllor.h
+        src/common/goods.cpp
+        src/common/goods.h
 )
 
 qt_add_executable(BillandSale_system
