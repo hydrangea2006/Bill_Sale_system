@@ -23,3 +23,4 @@ qrc_*.cpp
 .vs/
 *.user
 CMakeLists.txt
+cmake-build-debug-qt_mingw/
