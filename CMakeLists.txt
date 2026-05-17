@@ -69,11 +69,30 @@ set(PROJECT_SOURCES
         src/module/cart_in/cartwidget.cpp
         src/module/cart_in/cartwidget.h
         src/module/cart_in/cartwidget.ui
+
+        # Deduct Widget 模块
+        src/module/deduct/deductwidget.cpp
+        src/module/deduct/deductwidget.h
+        src/module/deduct/deductwidget.ui
+
+        # Balance 模块
+        src/module/balance/balancewidget.cpp
+        src/module/balance/balancewidget.h
+        src/module/balance/balancewidget.ui
+
+        # Address 模块
+        src/module/address/addresswidget.cpp
+        src/module/address/addresswidget.h
+        src/module/address/addresswidget.ui
         )
+
+
 
 qt_add_executable(BillandSale_system
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        src/module/balance/balancewidget.h src/module/balance/balancewidget.cpp src/module/balance/balancewidget.ui
+        src/module/address/addresswidget.h src/module/address/addresswidget.cpp src/module/address/addresswidget.ui
         )
 
 target_include_directories(BillandSale_system PRIVATE
