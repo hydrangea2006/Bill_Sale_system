@@ -64,6 +64,11 @@ set(PROJECT_SOURCES
         src/module/inventory/inventorywidget.cpp
         src/module/inventory/inventorywidget.h
         src/module/inventory/inventorywidget.ui
+
+        # Cart Widget 模块
+        src/module/cart_in/cartwidget.cpp
+        src/module/cart_in/cartwidget.h
+        src/module/cart_in/cartwidget.ui
         )
 
 qt_add_executable(BillandSale_system

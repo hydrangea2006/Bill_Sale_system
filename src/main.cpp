@@ -5,6 +5,7 @@
 #include "login_controllor.h"
 #include "databasemanager.h"
 #include "module/inventory/inventorywidget.h"
+#include "module/cart_in/cartwidget.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,9 +22,9 @@ int main(int argc, char *argv[])
     con.setView(&loginWidget);
     loginWidget.show();
 
-    // === 临时：直接显示库存界面===
-    InventoryWidget inventoryWidget;
-    inventoryWidget.show();
+    // ===== 临时：直接显示入库界面（测试用）=====
+    CartWidget cartWidget;
+    cartWidget.show();
 
     return a.exec();
 }
