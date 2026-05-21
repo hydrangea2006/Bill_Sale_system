@@ -1,5 +1,6 @@
 #include "cartwidget.h"
 #include "ui_cartwidget.h"
+#include "databasemanager.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QDateTime>
@@ -27,7 +28,8 @@ CartWidget::CartWidget(QWidget *parent)
     connect(ui->cartTable, &QTableWidget::itemDoubleClicked,
             this, &CartWidget::onCartTableDoubleClicked);
 
-    setCurrentUser(1, "测试用户", 1000.00);
+    double initBalance = DatabaseManager::instance().getBalance();
+    setCurrentUser(1, "测试用户", initBalance);
     updateStatus("就绪");
 }
 
@@ -81,9 +83,17 @@ void CartWidget::refreshProductList()
 {
     ui->productCombo->clear();
     ui->productCombo->addItem("请选择商品", -1);
-    ui->productCombo->addItem("笔记本电脑", 1001);
-    ui->productCombo->addItem("无线鼠标", 1002);
-    ui->productCombo->addItem("机械键盘", 1003);
+
+    DatabaseManager& db = DatabaseManager::instance();
+    QList<ProductRecord> products = db.getAllProducts();
+    for (const auto& p : products) {
+        if (p.quantity > 0) {
+            ui->productCombo->addItem(
+                QString("%1 (¥%2)").arg(p.name).arg(p.salePrice, 0, 'f', 2),
+                p.id
+            );
+        }
+    }
 }
 
 void CartWidget::refreshCart()
@@ -95,21 +105,19 @@ void CartWidget::refreshCart()
 void CartWidget::refreshOrders()
 {
     QList<Order> orders;
-    Order order1;
-    order1.id = 1;
-    order1.orderNo = "202405190001";
-    order1.totalAmount = 5038.00;
-    order1.status = "已支付";
-    order1.createTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    orders.append(order1);
 
-    Order order2;
-    order2.id = 2;
-    order2.orderNo = "202405180002";
-    order2.totalAmount = 39.00;
-    order2.status = "已支付";
-    order2.createTime = QDateTime::currentDateTime().addDays(-1).toString("yyyy-MM-dd hh:mm:ss");
-    orders.append(order2);
+    DatabaseManager& db = DatabaseManager::instance();
+    QList<SalesOrderRecord> dbOrders = db.getUserOrders(m_currentUserId);
+
+    for (const auto& o : dbOrders) {
+        Order order;
+        order.id = o.id;
+        order.orderNo = QString("%1%2").arg(o.createdAt.left(8)).arg(o.id, 4, 10, QChar('0'));
+        order.totalAmount = o.totalAmount;
+        order.status = "已支付";
+        order.createTime = o.createdAt;
+        orders.append(order);
+    }
 
     m_orders = orders;
     displayOrders(orders);
@@ -250,32 +258,30 @@ bool CartWidget::checkout()
         return false;
     }
 
-    if (!deductBalance(m_currentUserId, total)) {
-        showError("扣款失败");
+    QList<SalesOrderItemRecord> items;
+    for (const auto& ci : m_cartItems) {
+        SalesOrderItemRecord item;
+        item.productId = ci.productId;
+        item.quantity = ci.quantity;
+        item.unitPrice = ci.price;
+        item.subtotal = ci.total;
+        items.append(item);
+    }
+
+    DatabaseManager& db = DatabaseManager::instance();
+    int orderId = db.createOrder(m_currentUserId, "", items);
+    if (orderId <= 0) {
+        showError("下单失败");
         return false;
     }
 
-    for (const CartItem &item : m_cartItems) {
-        if (!updateProductStock(item.productId, item.quantity)) {
-            showError(QString("更新商品 %1 库存失败").arg(item.productName));
-            return false;
-        }
-    }
-
-    Order newOrder;
-    newOrder.id = QDateTime::currentDateTime().toSecsSinceEpoch();
-    newOrder.orderNo = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
-    newOrder.totalAmount = total;
-    newOrder.status = "已支付";
-    newOrder.createTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    m_orders.prepend(newOrder);
-
+    m_currentBalance = db.getBalance();
     m_cartItems.clear();
     refreshCart();
     refreshOrders();
     refreshBalance();
 
-    showSuccess(QString("下单成功！订单号：%1").arg(newOrder.orderNo));
+    showSuccess(QString("下单成功！订单号：%1").arg(orderId));
     return true;
 }
 
@@ -415,33 +421,23 @@ void CartWidget::showSuccess(const QString &message)
 
 int CartWidget::getProductStock(int productId)
 {
-    Q_UNUSED(productId);
-    return 50;
+    ProductRecord p = DatabaseManager::instance().getProductById(productId);
+    return (p.id > 0) ? p.quantity : 0;
 }
 
 double CartWidget::getProductPrice(int productId)
 {
-    switch (productId) {
-    case 1001: return 4999.00;
-    case 1002: return 39.00;
-    case 1003: return 249.00;
-    default: return 0;
-    }
+    ProductRecord p = DatabaseManager::instance().getProductById(productId);
+    return (p.id > 0) ? p.salePrice : 0.0;
 }
 
 bool CartWidget::deductBalance(int userId, double amount)
 {
     Q_UNUSED(userId);
-    if (amount <= m_currentBalance) {
-        m_currentBalance -= amount;
-        return true;
-    }
-    return false;
+    return DatabaseManager::instance().deductBalance(amount);
 }
 
 bool CartWidget::updateProductStock(int productId, int quantity)
 {
-    Q_UNUSED(productId);
-    Q_UNUSED(quantity);
-    return true;
+    return DatabaseManager::instance().deductProductStock(productId, quantity);
 }

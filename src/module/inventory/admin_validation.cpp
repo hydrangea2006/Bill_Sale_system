@@ -1,5 +1,6 @@
 #include "admin_validation.h"
 #include "ui_admin_validation.h"
+#include "admin.h"
 #include "module/inventory/inventorywidget.h"
 #include <QMessageBox>
 #include <QDebug>
@@ -20,13 +21,30 @@ AdminValidation::~AdminValidation()
 
 bool AdminValidation::registerAdmin(const QString &username, const QString &password)
 {
+    // 使用 Admin 类校验
+    Admin admin(username, password, ADMIN_OPERATOR);
+
+    // 验证用户名
+    AdminValidationError err;
+    if (!Admin::validateAdminUsername(username, &err)) {
+        showError(Admin::getErrorMessage(err));
+        return false;
+    }
+
+    // 验证密码
+    if (!Admin::validateAdminPassword(password, &err)) {
+        showError(Admin::getErrorMessage(err));
+        return false;
+    }
+
+    // 验证密钥（管理员注册需要密钥）
+    // TODO: 从界面上获取密钥输入后进行校验
+
+    qDebug() << "管理员注册信息:" << admin.toString();
+
     // TODO: 将管理员信息存入数据库
-    // INSERT INTO admins (username, password, create_time) VALUES (?, ?, ?)
+    // INSERT INTO admins (username, password_hash, role) VALUES (?, ?, ?)
 
-    Q_UNUSED(username);
-    Q_UNUSED(password);
-
-    // 模拟注册成功
     return true;
 }
 
@@ -37,18 +55,14 @@ void AdminValidation::onRegisterButtonClicked()
     QString confirm = ui->confirmEdit->text();
 
     // 验证输入
-    if (username.isEmpty()) {
-        showError("请输入用户名");
+    AdminValidationError err;
+    if (!Admin::validateAdminUsername(username, &err)) {
+        showError(Admin::getErrorMessage(err));
         return;
     }
 
-    if (password.isEmpty()) {
-        showError("请输入密码");
-        return;
-    }
-
-    if (password.length() < 6) {
-        showError("密码长度不能少于6位");
+    if (!Admin::validateAdminPassword(password, &err)) {
+        showError(Admin::getErrorMessage(err));
         return;
     }
 

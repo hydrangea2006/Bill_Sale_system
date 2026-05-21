@@ -34,11 +34,11 @@ int main(int argc, char *argv[])
     AddressWidget addressWidget;
 
     // 显示所有窗口
-    // inventoryWidget.show();
-    // cartWidget.show();
-    // deductWidget.show();
-    // balanceWidget.show();
-    // addressWidget.show();
+    inventoryWidget.show();
+    cartWidget.show();
+    deductWidget.show();
+    balanceWidget.show();
+    addressWidget.show();
 
     AdminValidation w;
     w.show();

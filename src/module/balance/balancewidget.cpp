@@ -1,5 +1,6 @@
 #include "balancewidget.h"
 #include "ui_balancewidget.h"
+#include "databasemanager.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QDebug>
@@ -53,23 +54,29 @@ void BalanceWidget::refreshTransactionHistory()
 {
     QList<TransactionRecord> records;
 
-    TransactionRecord r1;
-    r1.id = 1;
-    r1.type = "充值";
-    r1.amount = 500.00;
-    r1.balance = 500.00;
-    r1.remark = "微信充值";
-    r1.createTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    records.append(r1);
+    DatabaseManager& db = DatabaseManager::instance();
+    QList<DatabaseManager::TransactionRecord> dbRecords = db.getAllTransactions();
 
-    TransactionRecord r2;
-    r2.id = 2;
-    r2.type = "消费";
-    r2.amount = 39.00;
-    r2.balance = 461.00;
-    r2.remark = "购买无线鼠标";
-    r2.createTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    records.append(r2);
+    // 从最新一条倒推每笔流水发生时的余额
+    double runningBalance = db.getBalance();
+    for (int i = 0; i < dbRecords.size(); ++i) {
+        const auto& dr = dbRecords[i];
+        TransactionRecord rec;
+        rec.id = dr.id;
+        rec.type = (dr.type == 1) ? "充值" : "消费";
+        rec.amount = dr.amount;
+        // 先记录当前余额（即该笔交易发生后的余额）
+        rec.balance = runningBalance;
+        // 再倒推：收入就减回去，支出就加回去
+        if (dr.type == 1) {
+            runningBalance -= dr.amount;
+        } else {
+            runningBalance += dr.amount;
+        }
+        rec.remark = dr.remark;
+        rec.createTime = dr.createdAt;
+        records.prepend(rec);  // prepend 使最终按时间正序排列
+    }
 
     displayTransactions(records);
     updateStatus(QString("加载了 %1 条交易记录").arg(records.size()));
@@ -77,7 +84,12 @@ void BalanceWidget::refreshTransactionHistory()
 
 bool BalanceWidget::recharge(double amount)
 {
-    Q_UNUSED(amount);
+    DatabaseManager& db = DatabaseManager::instance();
+    if (!db.rechargeBalance(amount)) {
+        showError("充值失败");
+        return false;
+    }
+    db.addTransaction(1, amount, QString("充值 ¥%1").arg(amount, 0, 'f', 2));
     refreshBalance();
     refreshTransactionHistory();
     return true;
@@ -90,6 +102,12 @@ bool BalanceWidget::withdraw(double amount)
         showError("余额不足，无法提现");
         return false;
     }
+    DatabaseManager& db = DatabaseManager::instance();
+    if (!db.deductBalance(amount)) {
+        showError("提现失败");
+        return false;
+    }
+    db.addTransaction(0, amount, QString("提现 ¥%1").arg(amount, 0, 'f', 2));
     refreshBalance();
     refreshTransactionHistory();
     return true;
@@ -97,7 +115,7 @@ bool BalanceWidget::withdraw(double amount)
 
 double BalanceWidget::getCurrentBalance()
 {
-    return 500.00;
+    return DatabaseManager::instance().getBalance();
 }
 
 void BalanceWidget::onRechargeButtonClicked()

@@ -25,13 +25,13 @@ public:
                            const QString &password,
                            const QString &confirmPassword);
 
-public slots:
-    // 后端调用：显示错误 / 成功
-    void showRegisterError(const QString &message);
+    public slots:
+        // 后端调用：显示错误 / 成功
+        void showRegisterError(const QString &message);
     void showRegisterSuccess(const QString &message);
 
-private slots:
-    void on_btn_BackToLogin_clicked();
+    private slots:
+        void on_btn_BackToLogin_clicked();
     void on_btn_RegisterSubmit_clicked();
 
 protected:

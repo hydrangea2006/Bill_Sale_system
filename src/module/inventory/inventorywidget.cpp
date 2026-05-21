@@ -1,5 +1,6 @@
 #include "inventorywidget.h"
 #include "ui_inventorywidget.h"
+#include "databasemanager.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QDialog>
@@ -122,43 +123,31 @@ void InventoryWidget::clearTable()
     ui->inventoryTable->setRowCount(0);
 }
 
+// ========== 辅助: 将数据库 ProductRecord 转为 UI 的 ProductInfo ==========
+static ProductInfo recordToInfo(const ProductRecord& rec)
+{
+    ProductInfo info;
+    info.id = rec.id;
+    info.name = rec.name;
+    info.quantity = rec.quantity;
+    info.warningLevel = 0;          // 数据库暂无警戒线字段，默认0
+    info.purchasePrice = rec.purchasePrice;
+    info.salePrice = rec.salePrice;
+    info.lastUpdate = rec.updatedAt;
+    return info;
+}
+
 // ========== 商品管理接口实现 ==========
 
 void InventoryWidget::refreshInventoryData()
 {
-    // TODO: 调用后端接口获取所有商品数据
+    auto& db = DatabaseManager::instance();
+    QList<ProductRecord> records = db.getAllProducts();
+
     QList<ProductInfo> products;
-
-    // 模拟数据 - 后端接入后删除
-    ProductInfo p1;
-    p1.id = 1001;
-    p1.name = "笔记本电脑";
-    p1.quantity = 15;
-    p1.warningLevel = 5;
-    p1.purchasePrice = 4500.0;
-    p1.salePrice = 4999.0;
-    p1.lastUpdate = QDate::currentDate().toString("yyyy-MM-dd");
-    products.append(p1);
-
-    ProductInfo p2;
-    p2.id = 1002;
-    p2.name = "无线鼠标";
-    p2.quantity = 50;
-    p2.warningLevel = 10;
-    p2.purchasePrice = 25.0;
-    p2.salePrice = 39.0;
-    p2.lastUpdate = QDate::currentDate().toString("yyyy-MM-dd");
-    products.append(p2);
-
-    ProductInfo p3;
-    p3.id = 1003;
-    p3.name = "机械键盘";
-    p3.quantity = 23;
-    p3.warningLevel = 8;
-    p3.purchasePrice = 180.0;
-    p3.salePrice = 249.0;
-    p3.lastUpdate = QDate::currentDate().toString("yyyy-MM-dd");
-    products.append(p3);
+    for (const auto& rec : records) {
+        products.append(recordToInfo(rec));
+    }
 
     displayProducts(products);
     updateStatus(QString("加载了 %1 条商品记录").arg(products.size()));
@@ -166,36 +155,67 @@ void InventoryWidget::refreshInventoryData()
 
 bool InventoryWidget::addProduct(const ProductInfo &product)
 {
-    // TODO: 调用后端接口添加商品
-    Q_UNUSED(product);
-    refreshInventoryData();
-    return true;
+    auto& db = DatabaseManager::instance();
+    int newId = db.addProduct(
+        product.name,
+        product.purchasePrice,
+        product.salePrice,
+        "个",            // 默认单位，可按需扩展对话框
+        product.quantity
+    );
+    if (newId > 0) {
+        showSuccess(QString("商品 '%1' 添加成功").arg(product.name));
+        refreshInventoryData();
+        return true;
+    }
+    showError("添加商品失败: " + db.getLastError());
+    return false;
 }
 
 bool InventoryWidget::updateProduct(int productId, const ProductInfo &product)
 {
-    // TODO: 调用后端接口更新商品
-    Q_UNUSED(productId);
-    Q_UNUSED(product);
-    refreshInventoryData();
-    return true;
+    auto& db = DatabaseManager::instance();
+    bool ok = db.updateProduct(
+        productId,
+        product.name,
+        product.purchasePrice,
+        product.salePrice,
+        "个",
+        ""
+    );
+    if (ok) {
+        // 如果编辑对话框中修改了库存量，同步更新库存
+        db.updateProductStock(productId, product.quantity);
+        showSuccess("商品已更新");
+        refreshInventoryData();
+        return true;
+    }
+    showError("更新失败: " + db.getLastError());
+    return false;
 }
 
 bool InventoryWidget::deleteProduct(int productId)
 {
-    // TODO: 调用后端接口删除商品
-    Q_UNUSED(productId);
-    refreshInventoryData();
-    return true;
+    auto& db = DatabaseManager::instance();
+    if (db.deleteProduct(productId)) {
+        showSuccess("商品已删除");
+        refreshInventoryData();
+        return true;
+    }
+    showError("删除失败: " + db.getLastError());
+    return false;
 }
 
 bool InventoryWidget::updateStock(int productId, int newQuantity)
 {
-    // TODO: 调用后端接口更新库存
-    Q_UNUSED(productId);
-    Q_UNUSED(newQuantity);
-    refreshInventoryData();
-    return true;
+    auto& db = DatabaseManager::instance();
+    if (db.updateProductStock(productId, newQuantity)) {
+        showSuccess("库存已更新");
+        refreshInventoryData();
+        return true;
+    }
+    showError("更新库存失败: " + db.getLastError());
+    return false;
 }
 
 void InventoryWidget::searchProductByName(const QString &name)
@@ -205,12 +225,12 @@ void InventoryWidget::searchProductByName(const QString &name)
         return;
     }
 
-    // TODO: 调用后端接口搜索
+    auto& db = DatabaseManager::instance();
+    QList<ProductRecord> records = db.searchProducts(name);
+
     QList<ProductInfo> results;
-    for (const ProductInfo &product : m_currentProducts) {
-        if (product.name.contains(name, Qt::CaseInsensitive)) {
-            results.append(product);
-        }
+    for (const auto& rec : records) {
+        results.append(recordToInfo(rec));
     }
 
     displayProducts(results);

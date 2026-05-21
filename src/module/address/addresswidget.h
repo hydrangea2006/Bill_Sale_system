@@ -27,6 +27,7 @@ public:
     explicit AddressWidget(QWidget *parent = nullptr);
     ~AddressWidget();
 
+    void setCurrentUser(int userId);
     void refreshAddressList();
     bool addAddress(const AddressInfo &address);
     bool updateAddress(int id, const AddressInfo &address);
@@ -51,6 +52,7 @@ private:
 
 private:
     Ui::AddressWidget *ui;
+    int m_currentUserId = 0;
     QList<AddressInfo> m_currentAddresses;
 };
 

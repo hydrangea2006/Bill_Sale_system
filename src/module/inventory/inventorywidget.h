@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QTableWidgetItem>
+#include <QList>
+#include <QString>
+#include <QDateTime>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class InventoryWidget; }

@@ -1,5 +1,6 @@
 #include "addresswidget.h"
 #include "ui_addresswidget.h"
+#include "databasemanager.h"
 #include <QMessageBox>
 #include <QDialog>
 #include <QVBoxLayout>
@@ -8,6 +9,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QPushButton>
+#include <QHBoxLayout>
 #include <QDebug>
 
 AddressWidget::AddressWidget(QWidget *parent)
@@ -19,6 +21,7 @@ AddressWidget::AddressWidget(QWidget *parent)
 
     connect(ui->addButton, &QPushButton::clicked, this, &AddressWidget::onAddButtonClicked);
 
+    setCurrentUser(1);
     refreshAddressList();
     updateStatus("就绪");
 }
@@ -45,31 +48,30 @@ void AddressWidget::setupTable()
     ui->addressTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
+void AddressWidget::setCurrentUser(int userId)
+{
+    m_currentUserId = userId;
+}
+
 void AddressWidget::refreshAddressList()
 {
     QList<AddressInfo> addresses;
 
-    AddressInfo a1;
-    a1.id = 1;
-    a1.name = "张三";
-    a1.phone = "13800138001";
-    a1.province = "广东省";
-    a1.city = "深圳市";
-    a1.district = "南山区";
-    a1.detail = "科技园路100号";
-    a1.isDefault = true;
-    addresses.append(a1);
+    DatabaseManager& db = DatabaseManager::instance();
+    QList<DatabaseManager::AddressRecord> dbAddresses = db.getUserAddresses(m_currentUserId);
 
-    AddressInfo a2;
-    a2.id = 2;
-    a2.name = "李四";
-    a2.phone = "13800138002";
-    a2.province = "广东省";
-    a2.city = "广州市";
-    a2.district = "天河区";
-    a2.detail = "体育西路200号";
-    a2.isDefault = false;
-    addresses.append(a2);
+    for (const auto& a : dbAddresses) {
+        AddressInfo addr;
+        addr.id = a.id;
+        addr.name = a.name;
+        addr.phone = a.phone;
+        addr.province = a.province;
+        addr.city = a.city;
+        addr.district = a.district;
+        addr.detail = a.detail;
+        addr.isDefault = a.isDefault;
+        addresses.append(addr);
+    }
 
     displayAddresses(addresses);
     updateStatus(QString("加载了 %1 个地址").arg(addresses.size()));
@@ -77,31 +79,45 @@ void AddressWidget::refreshAddressList()
 
 bool AddressWidget::addAddress(const AddressInfo &address)
 {
-    Q_UNUSED(address);
-    refreshAddressList();
-    return true;
+    DatabaseManager& db = DatabaseManager::instance();
+    int id = db.addAddress(m_currentUserId, address.name, address.phone,
+                           address.province, address.city, address.district,
+                           address.detail, address.isDefault);
+    if (id > 0) {
+        refreshAddressList();
+        return true;
+    }
+    return false;
 }
 
 bool AddressWidget::updateAddress(int id, const AddressInfo &address)
 {
-    Q_UNUSED(id);
-    Q_UNUSED(address);
-    refreshAddressList();
-    return true;
+    DatabaseManager& db = DatabaseManager::instance();
+    bool ok = db.updateAddress(id, address.name, address.phone,
+                               address.province, address.city, address.district,
+                               address.detail, address.isDefault);
+    if (ok) refreshAddressList();
+    return ok;
 }
 
 bool AddressWidget::deleteAddress(int id)
 {
-    Q_UNUSED(id);
-    refreshAddressList();
-    return true;
+    DatabaseManager& db = DatabaseManager::instance();
+    if (db.deleteAddress(id)) {
+        refreshAddressList();
+        return true;
+    }
+    return false;
 }
 
 bool AddressWidget::setDefaultAddress(int id)
 {
-    Q_UNUSED(id);
-    refreshAddressList();
-    return true;
+    DatabaseManager& db = DatabaseManager::instance();
+    if (db.setDefaultAddress(m_currentUserId, id)) {
+        refreshAddressList();
+        return true;
+    }
+    return false;
 }
 
 void AddressWidget::onAddButtonClicked()
@@ -194,9 +210,31 @@ void AddressWidget::displayAddresses(const QList<AddressInfo> &addresses)
 
         ui->addressTable->setCellWidget(i, 5, widget);
 
-        connect(editBtn, &QPushButton::clicked, this, &AddressWidget::onEditButtonClicked);
-        connect(deleteBtn, &QPushButton::clicked, this, &AddressWidget::onDeleteButtonClicked);
-        connect(defaultBtn, &QPushButton::clicked, this, &AddressWidget::onSetDefaultButtonClicked);
+        connect(editBtn, &QPushButton::clicked, this, [this, i]() {
+            AddressInfo addr = m_currentAddresses[i];
+            if (showAddressDialog(addr, true)) {
+                updateAddress(addr.id, addr);
+                showSuccess("地址更新成功");
+            }
+        });
+        connect(deleteBtn, &QPushButton::clicked, this, [this, i]() {
+            AddressInfo addr = m_currentAddresses[i];
+            QMessageBox::StandardButton reply = QMessageBox::question(
+                this, "确认删除",
+                QString("确定要删除地址 \"%1\" 吗？").arg(addr.name),
+                QMessageBox::Yes | QMessageBox::No);
+            if (reply == QMessageBox::Yes) {
+                deleteAddress(addr.id);
+                showSuccess("地址删除成功");
+            }
+        });
+        if (defaultBtn) {
+            connect(defaultBtn, &QPushButton::clicked, this, [this, i]() {
+                AddressInfo addr = m_currentAddresses[i];
+                setDefaultAddress(addr.id);
+                showSuccess("已设为默认地址");
+            });
+        }
     }
 }
 

@@ -17,13 +17,13 @@ public:
     // 构建核心：注入界面指针并绑定信号
     void setView(LoginWidget* view);
 
-private slots:
-    // 这里的参数必须对应 LoginWidget 的信号参数
-    // controllor.h
-private slots:
-    void onHandleRegister(const QString &u, const QString &e,
-                          const QString &ph, const QString &p,
-                          const QString &cp);
+    private slots:
+        // 这里的参数必须对应 LoginWidget 的信号参数
+        // controllor.h
+    private slots:
+        void onHandleRegister(const QString &u, const QString &e,
+                              const QString &ph, const QString &p,
+                              const QString &cp);
 
     void onHandleLogin(const QString &username, const QString &password);
 

@@ -1,5 +1,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "emailservice.h"
+#include "databasemanager.h"
+#include "hashsha.h"
+#include "desutil.h"
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -47,12 +51,27 @@ void MainWindow::on_btn_getCode_clicked()
 {
     QString account = ui->edit_account->text().trimmed();
     if (account.isEmpty()) {
-        QMessageBox::warning(this, "提示", "请输入账号/手机号");
+        QMessageBox::warning(this, "提示", "请输入账号/邮箱");
         return;
     }
-    // 前端只校验非空，具体发验证码逻辑由后端处理
-    // 如需通知后端，可在此处增加信号发射
-    QMessageBox::information(this, "提示", "验证码已发送（模拟: 123456）");
+
+    // 查数据库获取邮箱（支持用户名/手机号/邮箱三种登录方式）
+    UserInfo info = DatabaseManager::instance().findUserByAccount(account);
+    if (info.id <= 0) {
+        QMessageBox::warning(this, "提示", "该账号不存在");
+        return;
+    }
+
+    // 发送验证码到用户邮箱
+    QString code = EmailService::sendVerificationCode(info.email);
+    if (code.isEmpty()) {
+        showResetError("验证码发送失败，请稍后重试");
+        return;
+    }
+
+    QMessageBox::information(this, "提示",
+        QString("验证码已发送至 %1\n（生产环境需配置SMTP，当前为调试模式: %2）")
+            .arg(info.email).arg(code));
 }
 
 // ========== 提交找回 ==========
@@ -77,8 +96,26 @@ void MainWindow::on_btn_submit_clicked()
         return;
     }
 
-    // 发射信号，后端接手验证验证码并重置密码
-    emit resetPasswordRequested(account, code, newPwd, confirmPwd);
+    // 查数据库获取邮箱
+    UserInfo info = DatabaseManager::instance().findUserByAccount(account);
+    if (info.id <= 0) {
+        showResetError("账号不存在");
+        return;
+    }
+
+    // 验证验证码
+    if (!EmailService::verifyCode(info.email, code)) {
+        showResetError("验证码错误或已过期");
+        return;
+    }
+
+    // 重置密码
+    QString hashed = HashSha::hashSha256(newPwd);
+    if (DatabaseManager::instance().updatePassword(info.id, hashed)) {
+        showResetSuccess("密码重置成功！");
+    } else {
+        showResetError("密码重置失败，请稍后重试");
+    }
 }
 
 // ========== 输入限制（保持原有）==========
