@@ -39,14 +39,14 @@ HomeWidget::~HomeWidget()
 
 void HomeWidget::setupUI(int role)
 {
-    setWindowTitle(QString("Bill&Sale 系统 - 欢迎 %1").arg(m_username));
+    setWindowTitle(QString("Bill&Sale System - Welcome %1").arg(m_username));
     resize(1200, 700);
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    // ========== 左侧边栏 ==========
+    // ========== Left Sidebar ==========
     QWidget* sidebar = new QWidget(this);
     sidebar->setFixedWidth(200);
     sidebar->setStyleSheet("QWidget { background-color: #304156; }");
@@ -54,7 +54,7 @@ void HomeWidget::setupUI(int role)
     sidebarLayout->setContentsMargins(0, 20, 0, 0);
     sidebarLayout->setSpacing(0);
 
-    m_userInfoLabel = new QLabel(QString("用户：%1").arg(m_username), sidebar);
+    m_userInfoLabel = new QLabel(QString("User: %1").arg(m_username), sidebar);
     m_userInfoLabel->setStyleSheet("QLabel { color: white; font-size: 14px; font-weight: bold; padding: 10px 15px; border-bottom: 1px solid #4B6A8A; }");
     m_userInfoLabel->setAlignment(Qt::AlignCenter);
     sidebarLayout->addWidget(m_userInfoLabel);
@@ -77,7 +77,7 @@ void HomeWidget::setupUI(int role)
     sidebarLayout->addWidget(m_menuList);
     sidebarLayout->addStretch();
 
-    QPushButton* logoutBtn = new QPushButton("退出登录", sidebar);
+    QPushButton* logoutBtn = new QPushButton("Logout", sidebar);
     logoutBtn->setStyleSheet(
         "QPushButton { background-color: #F56C6C; color: white; border: none; padding: 10px; margin: 15px; border-radius: 4px; font-size: 14px; }"
         "QPushButton:hover { background-color: #F78989; }"
@@ -85,7 +85,7 @@ void HomeWidget::setupUI(int role)
     connect(logoutBtn, &QPushButton::clicked, this, &HomeWidget::onLogout);
     sidebarLayout->addWidget(logoutBtn);
 
-    // ========== 右侧内容区 ==========
+    // ========== Right Content Area ==========
     m_stackedWidget = new QStackedWidget(this);
     m_stackedWidget->setStyleSheet("QStackedWidget { background-color: #F5F7FA; }");
 
@@ -105,8 +105,8 @@ void HomeWidget::setupUI(int role)
 void HomeWidget::setupUserMenu()
 {
     QList<QPair<QString, QString>> menus = {
-        {"🛒 购物车", "cart"},
-        {"📍 结算", "address"}
+        {"🛒 Cart", "cart"},
+        {"📍 Checkout", "address"}
     };
 
     for (const auto& menu : menus) {
@@ -119,11 +119,11 @@ void HomeWidget::setupUserMenu()
 void HomeWidget::setupAdminMenu()
 {
     QList<QPair<QString, QString>> menus = {
-        {"📦 库存管理", "inventory"},
-        {"📦 进货管理", "purchase"},
-        {"📤 出库管理", "deduct"},
-        {"💰 库存余额", "balance"},
-        {"📋 报表", "report"}
+        {"📦 Inventory", "inventory"},
+        {"📦 Purchase", "purchase"},
+        {"📤 Stock Out", "deduct"},
+        {"💰 Balance", "balance"},
+        {"📋 Report", "report"}
     };
 
     for (const auto& menu : menus) {
@@ -132,6 +132,7 @@ void HomeWidget::setupAdminMenu()
 
     connect(m_menuList, &QListWidget::currentRowChanged, this, &HomeWidget::onMenuClicked);
 }
+
 void HomeWidget::createUserPages()
 {
     m_cartWidget = new CartWidget(m_userId, 0, this);
@@ -143,12 +144,12 @@ void HomeWidget::createUserPages()
     m_addressWidget = new AddressWidget(m_userId, this);
     m_stackedWidget->addWidget(m_addressWidget);
 
-    // 先创建所有控制器，确保信号连接就绪
+    // Create all controllers first to ensure signal connections are ready
     new cart_controllor(m_userId, m_cartWidget, this);
     new address_controllor(m_userId, m_addressWidget, this);
     new deduct_controllor(m_userId, 0, m_deductWidget, this);
 
-    // 控制器连接完成后，再触发初始数据加载
+    // After controllers are connected, trigger initial data loading
     emit m_cartWidget->refreshRequested();
     emit m_deductWidget->loadCheckoutDataRequested();
 
@@ -175,7 +176,7 @@ void HomeWidget::createAdminPages()
     m_reportWidget = new ReportWidget(m_userId, this);
     m_stackedWidget->addWidget(m_reportWidget);
 
-    // 创建控制器并连接信号
+    // Create controllers and connect signals
     InventoryControllor* inventoryCtrl = new InventoryControllor(this);
     inventoryCtrl->bindWithView(m_inventoryWidget);
 
@@ -184,7 +185,7 @@ void HomeWidget::createAdminPages()
     new balance_controllor(m_userId, m_balanceWidget, this);
     new report_controllor(m_userId, m_reportWidget, this);
 
-    // 初始加载数据
+    // Initial data load
     emit m_inventoryWidget->refreshRequested();
 }
 
