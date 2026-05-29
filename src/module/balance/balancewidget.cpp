@@ -47,17 +47,17 @@ void BalanceWidget::setupUI()
     adjustWidget->setStyleSheet("QWidget { background-color: #F5F7FA; border-radius: 8px; }");
     QHBoxLayout* adjustLayout = new QHBoxLayout(adjustWidget);
 
-    QLabel* amountLabel = new QLabel("调整金额:", this);
+    QLabel* amountLabel = new QLabel("Adjust Amount:", this);
     m_adjustAmountEdit = new QLineEdit(this);
-    m_adjustAmountEdit->setPlaceholderText("正数增加，负数减少");
+    m_adjustAmountEdit->setPlaceholderText("Positive for increase, negative for decrease");
     m_adjustAmountEdit->setFixedWidth(150);
 
-    QLabel* remarkLabel = new QLabel("备注:", this);
+    QLabel* remarkLabel = new QLabel("Remark:", this);
     m_adjustRemarkEdit = new QLineEdit(this);
-    m_adjustRemarkEdit->setPlaceholderText("调整原因");
+    m_adjustRemarkEdit->setPlaceholderText("Adjustment reason");
     m_adjustRemarkEdit->setFixedWidth(200);
 
-    m_adjustBtn = new QPushButton("确认调整", this);
+    m_adjustBtn = new QPushButton("Confirm Adjust", this);
     m_adjustBtn->setFixedSize(100, 32);
     m_adjustBtn->setStyleSheet("QPushButton { background-color: #E6A23C; color: white; border-radius: 4px; }");
 
@@ -72,13 +72,13 @@ void BalanceWidget::setupUI()
     mainLayout->addWidget(adjustWidget); // 直接作为核心组件加入布局
 
     // ================= 3. 交易记录表格 =================
-    QLabel* historyLabel = new QLabel("资金流水明细", this);
+    QLabel* historyLabel = new QLabel("Fund Transaction Details", this);
     historyLabel->setStyleSheet("QLabel { font-size: 16px; font-weight: bold; margin-top: 10px; }");
     mainLayout->addWidget(historyLabel);
 
     m_transactionTable = new QTableWidget(this);
     m_transactionTable->setColumnCount(5);
-    QStringList headers = {"时间", "类型", "变动金额", "当前变动后余额", "备注说明"};
+    QStringList headers = {"Time", "Type", "Amount", "Balance After", "Remark"};
     m_transactionTable->setHorizontalHeaderLabels(headers);
     m_transactionTable->horizontalHeader()->setStretchLastSection(true);
     m_transactionTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -89,7 +89,7 @@ void BalanceWidget::setupUI()
     // ================= 4. 底部刷新按钮 =================
     QHBoxLayout* bottomLayout = new QHBoxLayout();
     bottomLayout->addStretch();
-    m_refreshBtn = new QPushButton("刷新", this);
+    m_refreshBtn = new QPushButton("Refresh", this);
     m_refreshBtn->setFixedSize(80, 32);
     bottomLayout->addWidget(m_refreshBtn);
     mainLayout->addLayout(bottomLayout);
@@ -103,12 +103,12 @@ void BalanceWidget::onAdjustBalance()
 {
     double amount = m_adjustAmountEdit->text().toDouble();
     if (amount == 0) {
-        QMessageBox::warning(this, "提示", "请输入有效的调整金额（非零）");
+        QMessageBox::warning(this, "Hint", "Please enter a valid amount (non-zero)");
         return;
     }
     QString remark = m_adjustRemarkEdit->text().trimmed();
     if (remark.isEmpty()) {
-        remark = "管理员手动调整";
+        remark = "Manual adjustment by admin";
     }
 
     // 发出调整资金信号，由后端接收并改写商户账本
@@ -127,7 +127,7 @@ void BalanceWidget::onRefreshClicked()
 
 void BalanceWidget::onBalanceLoaded(double balance, const QString& accountName)
 {
-    m_accountNameLabel->setText(QString("账户：%1").arg(accountName));
+    m_accountNameLabel->setText(QString("Account: %1").arg(accountName));
     m_balanceLabel->setText(QString("¥%1").arg(balance, 0, 'f', 2));
 }
 
@@ -146,11 +146,11 @@ void BalanceWidget::onTransactionsLoaded(const QList<QVariantMap>& transactions)
 
 void BalanceWidget::onOperationSuccess(const QString& message)
 {
-    QMessageBox::information(this, "成功", message);
+    QMessageBox::information(this, "Success", message);
     emit refreshRequested(); // 操作成功后自动刷新资产看板
 }
 
 void BalanceWidget::onOperationError(const QString& error)
 {
-    QMessageBox::warning(this, "失败", error);
+    QMessageBox::warning(this, "Failed", error);
 }
