@@ -24,13 +24,13 @@ RegisterWidget::RegisterWidget(int role, QWidget *parent)
     ui->cardWidget->setGraphicsEffect(shadow);
 
     if (role == 1) {
-        ui->label_title->setText("👑 管理员注册");
+        ui->label_title->setText("👑 Admin Registration");
         ui->btn_RegisterSubmit->setStyleSheet(
             "QPushButton { background-color: #e6a23c; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; }"
             "QPushButton:hover { background-color: #d4912e; }"
             );
     } else {
-        ui->label_title->setText("📝 用户注册");
+        ui->label_title->setText("📝 User Registration");
         ui->btn_RegisterSubmit->setStyleSheet(
             "QPushButton { background-color: #67c23a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; }"
             "QPushButton:hover { background-color: #5daf34; }"
@@ -88,12 +88,12 @@ void RegisterWidget::mouseMoveEvent(QMouseEvent *event)
 
 void RegisterWidget::showRegisterError(const QString &message)
 {
-    QMessageBox::warning(this, "注册失败", message);
+    QMessageBox::warning(this, "Registration Failed", message);
 }
 
 void RegisterWidget::showRegisterSuccess(const QString &message)
 {
-    QMessageBox::information(this, "注册成功", message);
+    QMessageBox::information(this, "Registration Success", message);
     emit backToLogin();
     this->close();
 }
@@ -113,31 +113,31 @@ void RegisterWidget::on_btn_RegisterSubmit_clicked()
     QString confirm  = ui->le_Register_ConfirmPwd->text();
 
     if (username.isEmpty()) {
-        QMessageBox::warning(this, "提示", "请输入用户名");
+        QMessageBox::warning(this, "Tip", "Please enter username");
         return;
     }
     if (username.length() < 3 || username.length() > 20) {
-        QMessageBox::warning(this, "提示", "用户名长度需在3-20位之间");
+        QMessageBox::warning(this, "Tip", "Username length must be between 3 and 20 characters");
         return;
     }
     if (email.isEmpty()) {
-        QMessageBox::warning(this, "提示", "请输入邮箱");
+        QMessageBox::warning(this, "Tip", "Please enter email");
         return;
     }
     if (!email.contains('@') || !email.contains('.')) {
-        QMessageBox::warning(this, "提示", "请输入有效的邮箱地址");
+        QMessageBox::warning(this, "Tip", "Please enter a valid email address");
         return;
     }
     if (password.isEmpty()) {
-        QMessageBox::warning(this, "提示", "请输入密码");
+        QMessageBox::warning(this, "Tip", "Please enter password");
         return;
     }
     if (password.length() < 6 || password.length() > 20) {
-        QMessageBox::warning(this, "提示", "密码长度需在6-20位之间");
+        QMessageBox::warning(this, "Tip", "Password length must be between 6 and 20 characters");
         return;
     }
     if (password != confirm) {
-        QMessageBox::warning(this, "提示", "两次输入的密码不一致");
+        QMessageBox::warning(this, "Tip", "Passwords do not match");
         return;
     }
 

@@ -64,12 +64,12 @@ void LoginWidget::mouseMoveEvent(QMouseEvent *event)
 
 void LoginWidget::showLoginError(const QString &message)
 {
-    QMessageBox::warning(this, "登录失败", message);
+    QMessageBox::warning(this, "Login Failed", message);
 }
 
 void LoginWidget::showLoginSuccess(const QString &message)
 {
-    QMessageBox::information(this, "登录成功", message);
+    QMessageBox::information(this, "Login Success", message);
 }
 
 void LoginWidget::navigateToHome(int userId, const QString &username, int role)
@@ -149,7 +149,7 @@ void LoginWidget::on_btn_registerAdmin_clicked()
 
     m_regWindow = new RegisterWidget(1);
     m_regWindow->setAttribute(Qt::WA_DeleteOnClose);
-    m_regWindow->setWindowTitle("注册管理员");
+    m_regWindow->setWindowTitle("Admin Registration");
 
     connect(m_regWindow, &RegisterWidget::destroyed, this, [this]() {
         m_regWindow = nullptr;
@@ -172,7 +172,7 @@ void LoginWidget::on_btnLogin_clicked()
     QString password = ui->lePassword->text();
 
     if (username.isEmpty() || password.isEmpty()) {
-        QMessageBox::warning(this, "提示", "请输入用户名和密码");
+        QMessageBox::warning(this, "Tip", "Please enter username and password");
         return;
     }
 

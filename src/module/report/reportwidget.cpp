@@ -27,7 +27,7 @@ void ReportWidget::setupUI()
     // 顶部筛选栏
     QHBoxLayout* topLayout = new QHBoxLayout();
 
-    QLabel* dateLabel = new QLabel("日期范围:", this);
+    QLabel* dateLabel = new QLabel("Date Range:", this);
     m_startDateEdit = new QDateTimeEdit(this);
     m_startDateEdit->setCalendarPopup(true);
     m_startDateEdit->setDateTime(QDateTime::currentDateTime().addDays(-30));
@@ -35,16 +35,16 @@ void ReportWidget::setupUI()
     m_endDateEdit->setCalendarPopup(true);
     m_endDateEdit->setDateTime(QDateTime::currentDateTime());
 
-    m_filterBtn = new QPushButton("筛选", this);
+    m_filterBtn = new QPushButton("Filter", this);
     m_filterBtn->setFixedSize(80, 32);
-    m_refreshBtn = new QPushButton("刷新", this);
+    m_refreshBtn = new QPushButton("Refresh", this);
     m_refreshBtn->setFixedSize(80, 32);
 
-    m_exportExcelBtn = new QPushButton("导出Excel", this);
+    m_exportExcelBtn = new QPushButton("Export Excel", this);
     m_exportExcelBtn->setFixedSize(100, 32);
     m_exportExcelBtn->setStyleSheet("QPushButton { background-color: #67C23A; color: white; border-radius: 4px; }");
 
-    m_exportPdfBtn = new QPushButton("导出PDF", this);
+    m_exportPdfBtn = new QPushButton("Export PDF", this);
     m_exportPdfBtn->setFixedSize(100, 32);
     m_exportPdfBtn->setStyleSheet("QPushButton { background-color: #F56C6C; color: white; border-radius: 4px; }");
 
@@ -67,18 +67,18 @@ void ReportWidget::setupUI()
     QWidget* summaryWidget = new QWidget();
     QVBoxLayout* summaryLayout = new QVBoxLayout(summaryWidget);
 
-    QGroupBox* summaryGroup = new QGroupBox("销售概览");
+    QGroupBox* summaryGroup = new QGroupBox("Sales Overview");
     QGridLayout* summaryGrid = new QGridLayout(summaryGroup);
 
-    QLabel* salesLabel = new QLabel("总销售额:");
+    QLabel* salesLabel = new QLabel("Total Sales:");
     m_totalSalesLabel = new QLabel("¥0.00");
     m_totalSalesLabel->setStyleSheet("QLabel { font-size: 24px; font-weight: bold; color: #F56C6C; }");
 
-    QLabel* profitLabel = new QLabel("总利润:");
+    QLabel* profitLabel = new QLabel("Total Profit:");
     m_totalProfitLabel = new QLabel("¥0.00");
     m_totalProfitLabel->setStyleSheet("QLabel { font-size: 24px; font-weight: bold; color: #67C23A; }");
 
-    QLabel* countLabel = new QLabel("订单数量:");
+    QLabel* countLabel = new QLabel("Order Count:");
     m_orderCountLabel = new QLabel("0");
     m_orderCountLabel->setStyleSheet("QLabel { font-size: 24px; font-weight: bold; color: #409EFF; }");
 
@@ -92,7 +92,7 @@ void ReportWidget::setupUI()
     summaryLayout->addWidget(summaryGroup);
     summaryLayout->addStretch();
 
-    m_tabWidget->addTab(summaryWidget, "📊 销售概览");
+    m_tabWidget->addTab(summaryWidget, "📊 Sales Overview");
 
     // ========== 销售趋势页 ==========
     QWidget* trendWidget = new QWidget();
@@ -100,13 +100,13 @@ void ReportWidget::setupUI()
 
     m_dailySalesTable = new QTableWidget();
     m_dailySalesTable->setColumnCount(2);
-    m_dailySalesTable->setHorizontalHeaderLabels({"日期", "销售额"});
+    m_dailySalesTable->setHorizontalHeaderLabels({"Date", "Sales Amount"});
     m_dailySalesTable->horizontalHeader()->setStretchLastSection(true);
     m_dailySalesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_dailySalesTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     trendLayout->addWidget(m_dailySalesTable);
-    m_tabWidget->addTab(trendWidget, "📈 销售趋势");
+    m_tabWidget->addTab(trendWidget, "📈 Sales Trend");
 
     // ========== 热销商品页 ==========
     QWidget* topProductsWidget = new QWidget();
@@ -114,13 +114,13 @@ void ReportWidget::setupUI()
 
     m_topProductsTable = new QTableWidget();
     m_topProductsTable->setColumnCount(4);
-    m_topProductsTable->setHorizontalHeaderLabels({"排名", "商品名称", "销量", "销售额"});
+    m_topProductsTable->setHorizontalHeaderLabels({"Rank", "Product Name", "Sales Volume", "Sales Amount"});
     m_topProductsTable->horizontalHeader()->setStretchLastSection(true);
     m_topProductsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_topProductsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     topProductsLayout->addWidget(m_topProductsTable);
-    m_tabWidget->addTab(topProductsWidget, "🏆 热销商品");
+    m_tabWidget->addTab(topProductsWidget, "🏆 Top Products");
 
     // ========== 订单明细页 ==========
     QWidget* ordersWidget = new QWidget();
@@ -128,13 +128,13 @@ void ReportWidget::setupUI()
 
     m_ordersTable = new QTableWidget();
     m_ordersTable->setColumnCount(6);
-    m_ordersTable->setHorizontalHeaderLabels({"订单ID", "用户", "总金额", "状态", "创建时间", "备注"});
+    m_ordersTable->setHorizontalHeaderLabels({"Order ID", "User", "Total Amount", "Status", "Create Time", "Remark"});
     m_ordersTable->horizontalHeader()->setStretchLastSection(true);
     m_ordersTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_ordersTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     ordersLayout->addWidget(m_ordersTable);
-    m_tabWidget->addTab(ordersWidget, "📋 订单明细");
+    m_tabWidget->addTab(ordersWidget, "📋 Order Details");
 
     // 连接信号
     connect(m_filterBtn, &QPushButton::clicked, this, &ReportWidget::onFilterClicked);
@@ -223,5 +223,5 @@ void ReportWidget::onSalesOrdersLoaded(const QList<QVariantMap>& orders)
 
 void ReportWidget::onOperationError(const QString& error)
 {
-    QMessageBox::warning(this, "错误", error);
+    QMessageBox::warning(this, "Error", error);
 }
