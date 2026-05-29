@@ -34,13 +34,13 @@ RegisterWidget::RegisterWidget(int role, QWidget *parent)
 
     // 根据角色（role）动态设置标题和按钮颜色
     if (role == 1) {
-        ui->label_title->setText("👑 Admin Registration");
+        ui->label_title->setText("👑 管理员注册");
         ui->btn_RegisterSubmit->setStyleSheet(
             "QPushButton { background-color: #e6a23c; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; }"
             "QPushButton:hover { background-color: #d4912e; }"
             );
     } else {
-        ui->label_title->setText("📝 User Registration");
+        ui->label_title->setText("📝 用户注册");
         ui->btn_RegisterSubmit->setStyleSheet(
             "QPushButton { background-color: #67c23a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; }"
             "QPushButton:hover { background-color: #5daf34; }"
@@ -106,14 +106,14 @@ void RegisterWidget::mouseMoveEvent(QMouseEvent *event)
 // 供控制器调用的错误提示接口
 void RegisterWidget::showRegisterError(const QString &message)
 {
-    QMessageBox::warning(this, "Registration Failed", message);
+    QMessageBox::warning(this, "注册失败", message);
 }
 
 // 供控制器调用的成功处理接口
 void RegisterWidget::showRegisterSuccess(const QString &message)
 {
-    QMessageBox::information(this, "Registration Success", message);
-    emit backToLogin();
+    QMessageBox::information(this, "注册成功", message);
+    emit backToLogin();  // 信号：通知登录界面返回操作
     this->close();
 }
 
@@ -134,34 +134,14 @@ void RegisterWidget::on_btn_RegisterSubmit_clicked()
     QString password = ui->le_Register_Password->text();
     QString confirm  = ui->le_Register_ConfirmPwd->text();
 
-    if (username.isEmpty()) {
-        QMessageBox::warning(this, "Tip", "Please enter username");
-        return;
-    }
-    if (username.length() < 3 || username.length() > 20) {
-        QMessageBox::warning(this, "Tip", "Username length must be between 3 and 20 characters");
-        return;
-    }
-    if (email.isEmpty()) {
-        QMessageBox::warning(this, "Tip", "Please enter email");
-        return;
-    }
-    if (!email.contains('@') || !email.contains('.')) {
-        QMessageBox::warning(this, "Tip", "Please enter a valid email address");
-        return;
-    }
-    if (password.isEmpty()) {
-        QMessageBox::warning(this, "Tip", "Please enter password");
-        return;
-    }
-    if (password.length() < 6 || password.length() > 20) {
-        QMessageBox::warning(this, "Tip", "Password length must be between 6 and 20 characters");
-        return;
-    }
-    if (password != confirm) {
-        QMessageBox::warning(this, "Tip", "Passwords do not match");
-        return;
-    }
+    // 格式化校验逻辑
+    if (username.isEmpty()) { QMessageBox::warning(this, "提示", "请输入用户名"); return; }
+    if (username.length() < 3 || username.length() > 20) { QMessageBox::warning(this, "提示", "用户名长度需在3-20位之间"); return; }
+    if (email.isEmpty()) { QMessageBox::warning(this, "提示", "请输入邮箱"); return; }
+    if (!email.contains('@') || !email.contains('.')) { QMessageBox::warning(this, "提示", "请输入有效的邮箱地址"); return; }
+    if (password.isEmpty()) { QMessageBox::warning(this, "提示", "请输入密码"); return; }
+    if (password.length() < 6 || password.length() > 20) { QMessageBox::warning(this, "提示", "密码长度需在6-20位之间"); return; }
+    if (password != confirm) { QMessageBox::warning(this, "提示", "两次输入的密码不一致"); return; }
 
     // 核心信号：将所有经过校验的注册数据发射给控制器层
     emit registerSubmitted(username, email, phone, password, confirm, m_role);

@@ -52,7 +52,7 @@ QLineEdit {
          </font>
         </property>
         <property name="text">
-         <string>Password Recovery System</string>
+         <string>密码找回系统</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
@@ -62,7 +62,7 @@ QLineEdit {
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Phone number：</string>
+         <string>账号/手机号</string>
         </property>
        </widget>
       </item>
@@ -81,7 +81,7 @@ QLineEdit {
     <item>
      <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>Verification Code：</string>
+       <string>验证码</string>
       </property>
      </widget>
     </item>
@@ -91,14 +91,14 @@ QLineEdit {
     <item>
      <widget class="QPushButton" name="btn_getCode">
       <property name="text">
-       <string>Get Code</string>
+       <string>获取验证码</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QLabel" name="label_4">
       <property name="text">
-       <string>New Password：</string>
+       <string>新密码</string>
       </property>
      </widget>
     </item>
@@ -112,7 +112,7 @@ QLineEdit {
     <item>
      <widget class="QLabel" name="label_5">
       <property name="text">
-       <string>Confirm New Password：</string>
+       <string>确认新密码</string>
       </property>
      </widget>
     </item>
@@ -133,14 +133,14 @@ QLineEdit {
     <item>
      <widget class="QPushButton" name="btn_submit">
       <property name="text">
-       <string>Submit Recovery</string>
+       <string>提交找回</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QPushButton" name="btn_back">
       <property name="text">
-       <string>Back to Login</string>
+       <string>返回登录</string>
       </property>
      </widget>
     </item>

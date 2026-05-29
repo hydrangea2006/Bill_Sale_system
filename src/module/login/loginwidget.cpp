@@ -79,42 +79,7 @@ LoginWidget::LoginWidget(QWidget *parent)
  */
 LoginWidget::~LoginWidget()
 {
-    delete ui;
-}
-
-void LoginWidget::on_btn_close_clicked()
-{
-    QApplication::quit();
-}
-
-void LoginWidget::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        QPoint pos = event->pos();
-        QWidget *child = childAt(pos);
-        if (child == ui->label_logo || pos.y() < 80) {
-            m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
-            event->accept();
-        }
-    }
-}
-
-void LoginWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    if (event->buttons() & Qt::LeftButton && !m_dragPosition.isNull()) {
-        move(event->globalPosition().toPoint() - m_dragPosition);
-        event->accept();
-    }
-}
-
-void LoginWidget::showLoginError(const QString &message)
-{
-    QMessageBox::warning(this, "Login Failed", message);
-}
-
-void LoginWidget::showLoginSuccess(const QString &message)
-{
-    QMessageBox::information(this, "Login Success", message);
+    delete ui;  // 删除UI对象，释放其管理的所有控件
 }
 
 // ==================== 私有槽函数 ====================
@@ -230,7 +195,8 @@ void LoginWidget::on_btn_registerAdmin_clicked()
     m_regWindow = new RegisterWidget(1);
     // 设置窗口关闭时自动释放内存
     m_regWindow->setAttribute(Qt::WA_DeleteOnClose);
-    m_regWindow->setWindowTitle("Admin Registration");
+    // 设置窗口标题（区分用户注册）
+    m_regWindow->setWindowTitle("注册管理员");
 
     // 监听注册窗口的销毁事件
     connect(m_regWindow, &RegisterWidget::destroyed, this, [this]() {
@@ -272,8 +238,8 @@ void LoginWidget::on_btnLogin_clicked()
 
     // 前端校验：用户名和密码不能为空
     if (username.isEmpty() || password.isEmpty()) {
-        QMessageBox::warning(this, "Tip", "Please enter username and password");
-        return;
+        QMessageBox::warning(this, "提示", "请输入用户名和密码");
+        return;  // 校验失败，不发射登录信号
     }
 
     // 发射登录信号，携带用户名和密码

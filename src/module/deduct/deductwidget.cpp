@@ -43,19 +43,19 @@ void DeductWidget::setupCheckoutUI()
     mainLayout->setSpacing(15);
 
     // 标题
-    QLabel* titleLabel = new QLabel("Order Checkout", this);
+    QLabel* titleLabel = new QLabel("订单结算", this);
     titleLabel->setStyleSheet("QLabel { font-size: 24px; font-weight: bold; color: #303133; }");
     titleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(titleLabel);
 
     // 商品列表
-    QLabel* itemsLabel = new QLabel("Product List", this);
+    QLabel* itemsLabel = new QLabel("商品清单", this);
     itemsLabel->setStyleSheet("QLabel { font-size: 16px; font-weight: bold; margin-top: 10px; }");
     mainLayout->addWidget(itemsLabel);
 
     m_tableWidget = new QTableWidget(this);
     m_tableWidget->setColumnCount(4);
-    m_tableWidget->setHorizontalHeaderLabels({"Product Name", "Unit Price", "Quantity", "Subtotal"});
+    m_tableWidget->setHorizontalHeaderLabels({"商品名称", "单价", "数量", "小计"});
     m_tableWidget->horizontalHeader()->setStretchLastSection(true);
     m_tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_tableWidget->setFixedHeight(200);
@@ -64,21 +64,21 @@ void DeductWidget::setupCheckoutUI()
     mainLayout->addWidget(m_tableWidget);
 
     // 收货地址区域
-    QLabel* addressLabel = new QLabel("Shipping Address", this);
+    QLabel* addressLabel = new QLabel("收货地址", this);
     addressLabel->setStyleSheet("QLabel { font-size: 16px; font-weight: bold; margin-top: 10px; }");
     mainLayout->addWidget(addressLabel);
 
     QHBoxLayout* addressLayout = new QHBoxLayout();
-    addressLayout->addWidget(new QLabel("Select Address:", this));
+    addressLayout->addWidget(new QLabel("选择地址:", this));
     m_addressCombo = new QComboBox(this);
     m_addressCombo->setMinimumWidth(400);
     addressLayout->addWidget(m_addressCombo);
 
-    m_addAddressBtn = new QPushButton("➕ Add Address", this);
+    m_addAddressBtn = new QPushButton("➕ 新增地址", this);
     m_addAddressBtn->setFixedSize(100, 32);
     m_addAddressBtn->setStyleSheet("QPushButton { background-color: #67C23A; color: white; border-radius: 4px; font-size: 12px; }");
 
-    m_refreshAddressBtn = new QPushButton("🔄 Refresh", this);
+    m_refreshAddressBtn = new QPushButton("🔄 刷新", this);
     m_refreshAddressBtn->setFixedSize(70, 32);
     m_refreshAddressBtn->setStyleSheet("QPushButton { background-color: #409EFF; color: white; border-radius: 4px; font-size: 12px; }");
 
@@ -92,12 +92,8 @@ void DeductWidget::setupCheckoutUI()
     infoWidget->setStyleSheet("QWidget { background-color: #F5F7FA; border-radius: 8px; }");
     QVBoxLayout* infoLayout = new QVBoxLayout(infoWidget);
 
-    m_totalLabel = new QLabel("Order Total: ¥0.00", this);
+    m_totalLabel = new QLabel("订单总额: ¥0.00", this);
     m_totalLabel->setStyleSheet("QLabel { font-size: 18px; font-weight: bold; color: #F56C6C; }");
-
-    m_balanceLabel = new QLabel("My Balance: ¥0.00", this);
-    m_balanceLabel->setStyleSheet("QLabel { font-size: 16px; color: #606266; }");
-
     infoLayout->addWidget(m_totalLabel);
 
     mainLayout->addWidget(infoWidget);
@@ -105,7 +101,7 @@ void DeductWidget::setupCheckoutUI()
     // 确认按钮布局
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->addStretch();
-    m_submitBtn = new QPushButton("Confirm Order", this);
+    m_submitBtn = new QPushButton("确认下单", this);
     m_submitBtn->setFixedSize(150, 40);
     m_submitBtn->setStyleSheet("QPushButton { background-color: #67C23A; color: white; border-radius: 4px; font-size: 14px; }");
     btnLayout->addWidget(m_submitBtn);
@@ -127,23 +123,23 @@ void DeductWidget::setupAdminUI()
     // 搜索栏
     QHBoxLayout* topLayout = new QHBoxLayout();
     m_searchEdit = new QLineEdit(this);
-    m_searchEdit->setPlaceholderText("Search Order No./User/Product...");
+    m_searchEdit->setPlaceholderText("搜索订单号/用户/商品...");
     m_searchEdit->setFixedHeight(32);
-    m_searchBtn = new QPushButton("Search", this);
+    m_searchBtn = new QPushButton("搜索", this);
     m_searchBtn->setFixedSize(80, 32);
 
     topLayout->addWidget(m_searchEdit);
     topLayout->addWidget(m_searchBtn);
     topLayout->addSpacing(20);
 
-    QLabel* dateLabel = new QLabel("Date Range:", this);
+    QLabel* dateLabel = new QLabel("日期范围:", this);
     m_startDateEdit = new QDateTimeEdit(this);
     m_startDateEdit->setCalendarPopup(true);
     m_startDateEdit->setDateTime(QDateTime::currentDateTime().addDays(-30));
     m_endDateEdit = new QDateTimeEdit(this);
     m_endDateEdit->setCalendarPopup(true);
     m_endDateEdit->setDateTime(QDateTime::currentDateTime());
-    m_filterBtn = new QPushButton("Filter", this);
+    m_filterBtn = new QPushButton("筛选", this);
     m_filterBtn->setFixedSize(80, 32);
 
     topLayout->addWidget(dateLabel);
@@ -155,10 +151,10 @@ void DeductWidget::setupAdminUI()
 
     // 操作按钮
     QHBoxLayout* btnLayout = new QHBoxLayout();
-    m_viewDetailBtn = new QPushButton("View Detail", this);
-    m_updateStatusBtn = new QPushButton("Update Status", this);
-    m_manualDeductBtn = new QPushButton("Manual Stock Out", this);
-    m_refreshBtn = new QPushButton("Refresh", this);
+    m_viewDetailBtn = new QPushButton("查看详情", this);
+    m_updateStatusBtn = new QPushButton("更新状态", this);
+    m_manualDeductBtn = new QPushButton("手动出库", this);
+    m_refreshBtn = new QPushButton("刷新", this);
 
     m_viewDetailBtn->setFixedSize(100, 32);
     m_updateStatusBtn->setFixedSize(100, 32);
@@ -178,9 +174,9 @@ void DeductWidget::setupAdminUI()
 
     // 状态筛选
     QHBoxLayout* statusLayout = new QHBoxLayout();
-    statusLayout->addWidget(new QLabel("Order Status:", this));
+    statusLayout->addWidget(new QLabel("订单状态:", this));
     m_statusCombo = new QComboBox(this);
-    m_statusCombo->addItems({"All", "Pending", "Confirmed", "Shipped", "Completed", "Canceled"});
+    m_statusCombo->addItems({"全部", "待处理", "已确认", "已发货", "已完成", "已取消"});
     statusLayout->addWidget(m_statusCombo);
     statusLayout->addStretch();
     mainLayout->addLayout(statusLayout);
@@ -188,7 +184,7 @@ void DeductWidget::setupAdminUI()
     // 订单表格
     m_tableWidget = new QTableWidget(this);
     m_tableWidget->setColumnCount(7);
-    QStringList headers = {"Order ID", "User ID", "Username", "Total Amount", "Status", "Create Time", "Action"};
+    QStringList headers = {"订单ID", "用户ID", "用户名称", "总金额", "状态", "创建时间", "操作"};
     m_tableWidget->setHorizontalHeaderLabels(headers);
     m_tableWidget->horizontalHeader()->setStretchLastSection(true);
     m_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -213,7 +209,7 @@ void DeductWidget::setupAdminUI()
 void DeductWidget::showAddressDialog()
 {
     QDialog dialog(this);
-    dialog.setWindowTitle("Add Address");
+    dialog.setWindowTitle("新增地址");
     dialog.setFixedSize(450, 550);
     dialog.setModal(true);
 
@@ -226,47 +222,47 @@ void DeductWidget::showAddressDialog()
     form->setLabelAlignment(Qt::AlignRight);
 
     QLineEdit* nameEdit = new QLineEdit(&dialog);
-    nameEdit->setPlaceholderText("Please enter consignee name");
+    nameEdit->setPlaceholderText("请输入收货人姓名");
     nameEdit->setMinimumHeight(36);
-    form->addRow("Consignee:", nameEdit);
+    form->addRow("收货人:", nameEdit);
 
     QLineEdit* phoneEdit = new QLineEdit(&dialog);
-    phoneEdit->setPlaceholderText("Please enter phone number");
+    phoneEdit->setPlaceholderText("请输入手机号码");
     phoneEdit->setMinimumHeight(36);
-    form->addRow("Phone Number:", phoneEdit);
+    form->addRow("手机号:", phoneEdit);
 
     QComboBox* provinceCombo = new QComboBox(&dialog);
     provinceCombo->setEditable(true);
-    provinceCombo->addItems({"Beijing", "Shanghai", "Guangdong", "Jiangsu", "Zhejiang", "Sichuan", "Hubei", "Hunan", "Fujian", "Shandong", "Henan", "Hebei", "Anhui", "Shaanxi", "Chongqing"});
+    provinceCombo->addItems({"北京市", "上海市", "广东省", "江苏省", "浙江省", "四川省", "湖北省", "湖南省", "福建省", "山东省", "河南省", "河北省", "安徽省", "陕西省", "重庆市"});
     provinceCombo->setMinimumHeight(36);
-    form->addRow("Province:", provinceCombo);
+    form->addRow("省份:", provinceCombo);
 
     QComboBox* cityCombo = new QComboBox(&dialog);
     cityCombo->setEditable(true);
     cityCombo->setMinimumHeight(36);
-    form->addRow("City:", cityCombo);
+    form->addRow("城市:", cityCombo);
 
     QComboBox* districtCombo = new QComboBox(&dialog);
     districtCombo->setEditable(true);
     districtCombo->setMinimumHeight(36);
-    form->addRow("District:", districtCombo);
+    form->addRow("区/县:", districtCombo);
 
     QTextEdit* detailEdit = new QTextEdit(&dialog);
-    detailEdit->setPlaceholderText("Please enter detailed address (street, community, house number)");
+    detailEdit->setPlaceholderText("请输入详细地址（街道、小区、门牌号）");
     detailEdit->setFixedHeight(80);
-    form->addRow("Detailed Address:", detailEdit);
+    form->addRow("详细地址:", detailEdit);
 
     QComboBox* isDefaultCombo = new QComboBox(&dialog);
-    isDefaultCombo->addItems({"No", "Yes"});
+    isDefaultCombo->addItems({"否", "是"});
     isDefaultCombo->setMinimumHeight(36);
-    form->addRow("Set as Default:", isDefaultCombo);
+    form->addRow("设为默认:", isDefaultCombo);
 
     dialogLayout->addLayout(form);
 
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->setSpacing(15);
-    QPushButton* submitBtn = new QPushButton("Confirm Add", &dialog);
-    QPushButton* cancelBtn = new QPushButton("Cancel", &dialog);
+    QPushButton* submitBtn = new QPushButton("确认添加", &dialog);
+    QPushButton* cancelBtn = new QPushButton("取消", &dialog);
     submitBtn->setFixedSize(120, 40);
     cancelBtn->setFixedSize(80, 40);
     submitBtn->setStyleSheet("QPushButton { background-color: #67C23A; color: white; border-radius: 4px; font-size: 14px; }");
@@ -279,20 +275,20 @@ void DeductWidget::showAddressDialog()
 
     connect(submitBtn, &QPushButton::clicked, [&]() {
         if (nameEdit->text().isEmpty()) {
-            QMessageBox::warning(&dialog, "Tip", "Please enter consignee name");
+            QMessageBox::warning(&dialog, "提示", "请输入收货人姓名");
             return;
         }
         if (phoneEdit->text().isEmpty()) {
-            QMessageBox::warning(&dialog, "Tip", "Please enter phone number");
+            QMessageBox::warning(&dialog, "提示", "请输入手机号");
             return;
         }
         QString phone = phoneEdit->text();
         if (phone.length() != 11 || !phone.contains(QRegularExpression("^1[3-9]\\d{9}$"))) {
-            QMessageBox::warning(&dialog, "Tip", "Please enter a valid phone number");
+            QMessageBox::warning(&dialog, "提示", "请输入有效的手机号码");
             return;
         }
         if (detailEdit->toPlainText().isEmpty()) {
-            QMessageBox::warning(&dialog, "Tip", "Please enter detailed address");
+            QMessageBox::warning(&dialog, "提示", "请输入详细地址");
             return;
         }
 
@@ -318,14 +314,11 @@ void DeductWidget::showAddressDialog()
 void DeductWidget::onSubmitClicked()
 {
     if (m_addressCombo->currentData().isNull()) {
-        QMessageBox::warning(this, "Tip", "Please select a shipping address");
+        QMessageBox::warning(this, "提示", "请选择收货地址");
         return;
     }
-    if (m_currentBalance < m_currentTotal) {
-        QMessageBox::warning(this, "Insufficient Balance",
-                             QString("Order Total ¥%1, Balance ¥%2, please recharge first").arg(m_currentTotal, 0, 'f', 2).arg(m_currentBalance, 0, 'f', 2));
-        return;
-    }
+
+    // 直接放行，允许生成线下结算/待后台确认的订单
     int addressId = m_addressCombo->currentData().toInt();
     emit submitOrderRequested(addressId, "");
 }
@@ -352,7 +345,7 @@ void DeductWidget::onCartItemsLoaded(const QList<QVariantMap>& items, double tot
         m_tableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(item["quantity"].toInt())));
         m_tableWidget->setItem(i, 3, new QTableWidgetItem(QString("¥%1").arg(subtotal, 0, 'f', 2)));
     }
-    m_totalLabel->setText(QString("Order Total: ¥%1").arg(total, 0, 'f', 2));
+    m_totalLabel->setText(QString("订单总额: ¥%1").arg(total, 0, 'f', 2));
 
     // 只要有商品就开启下单功能，不再管账户内有没有余额
     m_submitBtn->setEnabled(true);
@@ -377,37 +370,23 @@ void DeductWidget::onAddressesLoaded(const QList<QVariantMap>& addresses)
     }
 }
 
-void DeductWidget::onBalanceLoaded(double balance)
-{
-    m_currentBalance = balance;
-    m_balanceLabel->setText(QString("My Balance: ¥%1").arg(balance, 0, 'f', 2));
-
-    if (m_currentBalance < m_currentTotal && m_currentTotal > 0) {
-        m_submitBtn->setEnabled(false);
-        m_submitBtn->setStyleSheet("QPushButton { background-color: #C0C4CC; color: white; border-radius: 4px; font-size: 14px; }");
-    } else if (m_currentTotal > 0) {
-        m_submitBtn->setEnabled(true);
-        m_submitBtn->setStyleSheet("QPushButton { background-color: #67C23A; color: white; border-radius: 4px; font-size: 14px; }");
-    }
-}
-
 void DeductWidget::onOrderResult(bool success, const QString& message)
 {
     if (success) {
-        QMessageBox::information(this, "Order Success", message);
+        QMessageBox::information(this, "下单成功", message);
         emit loadCheckoutDataRequested();
     } else {
-        QMessageBox::warning(this, "Order Failed", message);
+        QMessageBox::warning(this, "下单失败", message);
     }
 }
 
 void DeductWidget::onAddAddressResult(bool success, const QString& message)
 {
     if (success) {
-        QMessageBox::information(this, "Success", message);
+        QMessageBox::information(this, "成功", message);
         emit refreshAddressesRequested();
     } else {
-        QMessageBox::warning(this, "Failed", message);
+        QMessageBox::warning(this, "失败", message);
     }
 }
 
@@ -426,7 +405,7 @@ void DeductWidget::onViewDetail()
 {
     int row = m_tableWidget->currentRow();
     if (row < 0) {
-        QMessageBox::warning(this, "Tip", "Please select an order first");
+        QMessageBox::warning(this, "提示", "请先选择订单");
         return;
     }
     showOrderDetailDialog(m_tableWidget->item(row, 0)->text().toInt());
@@ -436,7 +415,7 @@ void DeductWidget::onUpdateStatus()
 {
     int row = m_tableWidget->currentRow();
     if (row < 0) {
-        QMessageBox::warning(this, "Tip", "Please select an order first");
+        QMessageBox::warning(this, "提示", "请先选择订单");
         return;
     }
     emit updateOrderStatusRequested(m_tableWidget->item(row, 0)->text().toInt(), m_statusCombo->currentIndex());
@@ -471,12 +450,12 @@ void DeductWidget::onOrdersLoaded(const QList<QVariantMap>& orders)
         QString statusStr;
         int status = order["status"].toInt();
         switch(status) {
-        case 0: statusStr = "Pending"; break;
-        case 1: statusStr = "Confirmed"; break;
-        case 2: statusStr = "Shipped"; break;
-        case 3: statusStr = "Completed"; break;
-        case 4: statusStr = "Canceled"; break;
-        default: statusStr = "Unknown"; break;
+        case 0: statusStr = "待处理"; break;
+        case 1: statusStr = "已确认"; break;
+        case 2: statusStr = "已发货"; break;
+        case 3: statusStr = "已完成"; break;
+        case 4: statusStr = "已取消"; break;
+        default: statusStr = "未知"; break;
         }
         m_tableWidget->setItem(i, 4, new QTableWidgetItem(statusStr));
         m_tableWidget->setItem(i, 5, new QTableWidgetItem(order["createdAt"].toString()));
@@ -485,7 +464,7 @@ void DeductWidget::onOrdersLoaded(const QList<QVariantMap>& orders)
         QHBoxLayout* actionLayout = new QHBoxLayout(actionWidget);
         actionLayout->setContentsMargins(4, 4, 4, 4);
         actionLayout->setSpacing(5);
-        QPushButton* detailBtn = new QPushButton("Detail");
+        QPushButton* detailBtn = new QPushButton("详情");
         detailBtn->setFixedSize(50, 25);
         detailBtn->setStyleSheet("QPushButton { background-color: #409EFF; color: white; border-radius: 3px; font-size: 11px; }");
         int orderId = order["id"].toInt();
@@ -505,27 +484,27 @@ void DeductWidget::onOrderDetailLoaded(const QVariantMap& orderDetail)
 
 void DeductWidget::onOperationSuccess(const QString& message)
 {
-    QMessageBox::information(this, "Success", message);
+    QMessageBox::information(this, "成功", message);
     emit refreshRequested();
 }
 
 void DeductWidget::onOperationError(const QString& error)
 {
-    QMessageBox::warning(this, "Failed", error);
+    QMessageBox::warning(this, "失败", error);
 }
 
 void DeductWidget::showOrderDetailDialog(int orderId)
 {
     QDialog dialog(this);
-    dialog.setWindowTitle(QString("Order Detail - ID: %1").arg(orderId));
+    dialog.setWindowTitle(QString("订单详情 - ID: %1").arg(orderId));
     dialog.setFixedSize(600, 400);
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QTableWidget* itemsTable = new QTableWidget(&dialog);
     itemsTable->setColumnCount(4);
-    itemsTable->setHorizontalHeaderLabels({"Product", "Unit Price", "Quantity", "Subtotal"});
+    itemsTable->setHorizontalHeaderLabels({"商品", "单价", "数量", "小计"});
     itemsTable->horizontalHeader()->setStretchLastSection(true);
     layout->addWidget(itemsTable);
-    QPushButton* closeBtn = new QPushButton("Close", &dialog);
+    QPushButton* closeBtn = new QPushButton("关闭", &dialog);
     closeBtn->setFixedSize(80, 32);
     layout->addWidget(closeBtn, 0, Qt::AlignCenter);
     connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
@@ -536,7 +515,7 @@ void DeductWidget::showOrderDetailDialog(int orderId)
 void DeductWidget::showManualDeductDialog()
 {
     QDialog dialog(this);
-    dialog.setWindowTitle("Manual Stock Out");
+    dialog.setWindowTitle("手动出库");
     dialog.setFixedSize(400, 250);
     QFormLayout* form = new QFormLayout(&dialog);
     QSpinBox* productIdSpin = new QSpinBox(&dialog);
@@ -544,20 +523,20 @@ void DeductWidget::showManualDeductDialog()
     QSpinBox* quantitySpin = new QSpinBox(&dialog);
     quantitySpin->setRange(1, 99999);
     QTextEdit* reasonEdit = new QTextEdit(&dialog);
-    reasonEdit->setPlaceholderText("Stock out reason (e.g.: Sale, Return)");
+    reasonEdit->setPlaceholderText("出库原因（如：销售出库、退货等）");
     reasonEdit->setFixedHeight(80);
-    form->addRow("Product ID:", productIdSpin);
-    form->addRow("Stock Out Quantity:", quantitySpin);
-    form->addRow("Reason:", reasonEdit);
-    QPushButton* submitBtn = new QPushButton("Confirm Stock Out", &dialog);
-    QPushButton* cancelBtn = new QPushButton("Cancel", &dialog);
+    form->addRow("商品ID:", productIdSpin);
+    form->addRow("出库数量:", quantitySpin);
+    form->addRow("出库原因:", reasonEdit);
+    QPushButton* submitBtn = new QPushButton("确认出库", &dialog);
+    QPushButton* cancelBtn = new QPushButton("取消", &dialog);
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->addWidget(submitBtn);
     btnLayout->addWidget(cancelBtn);
     form->addRow(btnLayout);
     connect(submitBtn, &QPushButton::clicked, [&]() {
         QString reason = reasonEdit->toPlainText().trimmed();
-        if (reason.isEmpty()) reason = "Manual Stock Out";
+        if (reason.isEmpty()) reason = "手动出库";
         emit manualDeductRequested(productIdSpin->value(), quantitySpin->value(), reason);
         dialog.accept();
     });
