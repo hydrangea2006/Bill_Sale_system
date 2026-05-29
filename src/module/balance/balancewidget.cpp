@@ -10,7 +10,8 @@ BalanceWidget::BalanceWidget(int userId, int role, QWidget *parent)
     , m_userId(userId)
     , m_role(role)
 {
-    setupUI(role);
+    // 统一初始化管理员界面，不再受 role 干扰
+    setupUI();
     emit refreshRequested();
 }
 
@@ -18,13 +19,13 @@ BalanceWidget::~BalanceWidget()
 {
 }
 
-void BalanceWidget::setupUI(int role)
+void BalanceWidget::setupUI()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(15);
 
-    // 余额显示区域
+    // ================= 1. 余额显示区域 =================
     QWidget* balanceWidget = new QWidget(this);
     balanceWidget->setStyleSheet("QWidget { background-color: #E6F7FF; border-radius: 8px; }");
     QVBoxLayout* balanceLayout = new QVBoxLayout(balanceWidget);
@@ -133,10 +134,12 @@ void BalanceWidget::setupAdminUI()
     adjustLayout->addWidget(m_adjustBtn);
     adjustLayout->addStretch();
 
-    mainLayout->insertWidget(1, adjustWidget);
+    mainLayout->addWidget(adjustWidget); // 直接作为核心组件加入布局
 
-    connect(m_adjustBtn, &QPushButton::clicked, this, &BalanceWidget::onAdjustBalance);
-}
+    // ================= 3. 交易记录表格 =================
+    QLabel* historyLabel = new QLabel("资金流水明细", this);
+    historyLabel->setStyleSheet("QLabel { font-size: 16px; font-weight: bold; margin-top: 10px; }");
+    mainLayout->addWidget(historyLabel);
 
 void BalanceWidget::onRecharge()
 {
@@ -160,7 +163,10 @@ void BalanceWidget::onAdjustBalance()
     if (remark.isEmpty()) {
         remark = "Admin manual adjustment";
     }
+
+    // 发出调整资金信号，由后端接收并改写商户账本
     emit adjustBalanceRequested(amount, remark);
+
     m_adjustAmountEdit->clear();
     m_adjustRemarkEdit->clear();
 }
@@ -170,7 +176,7 @@ void BalanceWidget::onRefreshClicked()
     emit refreshRequested();
 }
 
-// ========== 后端调用的槽 ==========
+// ========== 后端调用的槽（完全保留，用于展示管理员数据） ==========
 
 void BalanceWidget::onBalanceLoaded(double balance, const QString& accountName)
 {

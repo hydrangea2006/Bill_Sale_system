@@ -52,9 +52,9 @@ private:
     void setupUI(int role);
     void setupUserUI();
     void setupAdminUI();
-    void loadSampleProducts();
 
-    QTableWidget* m_tableWidget;
+    QTableWidget* m_tableWidget;       // 商品列表/进货单表格
+    QTableWidget* m_cartTable;        // 购物车商品表格
     QLineEdit* m_searchEdit;
     QPushButton* m_searchBtn;
     QPushButton* m_refreshBtn;

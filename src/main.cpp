@@ -1,14 +1,17 @@
 #include <QApplication>
-#include <QDebug>
-#include "common/databasemanager.h"
+#include <QStyleFactory>
+#include "thememanager.h"
+#include "databasemanager.h"
 #include "module/login/loginwidget.h"
 #include "module/login/login_controllor.h"
 #include "module/homewidget.h"
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    ThemeManager::forceLightTheme();
     if (!DatabaseManager::instance().connectToDatabase()) {
         qDebug() << "数据库连接失败：" << DatabaseManager::instance().getLastError();
         return -1;

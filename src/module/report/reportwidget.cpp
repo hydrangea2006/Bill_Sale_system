@@ -1,17 +1,15 @@
 #include "reportwidget.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QHeaderView>
-#include <QMessageBox>
 #include <QGroupBox>
-#include <QFormLayout>
+#include <QGridLayout>
+#include <QMessageBox>
 
 ReportWidget::ReportWidget(int userId, QWidget *parent)
     : QWidget(parent)
     , m_userId(userId)
 {
     setupUI();
-    emit refreshRequested();
 }
 
 ReportWidget::~ReportWidget()
@@ -69,6 +67,7 @@ void ReportWidget::setupUI()
 
     QGroupBox* summaryGroup = new QGroupBox("Sales Overview");
     QGridLayout* summaryGrid = new QGridLayout(summaryGroup);
+    summaryGrid->setSpacing(20);
 
     QLabel* salesLabel = new QLabel("Total Sales:");
     m_totalSalesLabel = new QLabel("¥0.00");
@@ -82,11 +81,11 @@ void ReportWidget::setupUI()
     m_orderCountLabel = new QLabel("0");
     m_orderCountLabel->setStyleSheet("QLabel { font-size: 24px; font-weight: bold; color: #409EFF; }");
 
-    summaryGrid->addWidget(salesLabel, 0, 0);
+    summaryGrid->addWidget(salesLabel, 0, 0, Qt::AlignRight);
     summaryGrid->addWidget(m_totalSalesLabel, 0, 1);
-    summaryGrid->addWidget(profitLabel, 1, 0);
+    summaryGrid->addWidget(profitLabel, 1, 0, Qt::AlignRight);
     summaryGrid->addWidget(m_totalProfitLabel, 1, 1);
-    summaryGrid->addWidget(countLabel, 2, 0);
+    summaryGrid->addWidget(countLabel, 2, 0, Qt::AlignRight);
     summaryGrid->addWidget(m_orderCountLabel, 2, 1);
 
     summaryLayout->addWidget(summaryGroup);
@@ -136,19 +135,7 @@ void ReportWidget::setupUI()
     ordersLayout->addWidget(m_ordersTable);
     m_tabWidget->addTab(ordersWidget, "📋 Order Details");
 
-    // 连接信号
-    connect(m_filterBtn, &QPushButton::clicked, this, &ReportWidget::onFilterClicked);
     connect(m_refreshBtn, &QPushButton::clicked, this, &ReportWidget::onRefreshClicked);
-    connect(m_exportExcelBtn, &QPushButton::clicked, this, &ReportWidget::onExportExcel);
-    connect(m_exportPdfBtn, &QPushButton::clicked, this, &ReportWidget::onExportPdf);
-    connect(m_tabWidget, &QTabWidget::currentChanged, this, &ReportWidget::onTabChanged);
-}
-
-void ReportWidget::onFilterClicked()
-{
-    QDateTime startDate = m_startDateEdit->dateTime();
-    QDateTime endDate = m_endDateEdit->dateTime();
-    emit filterByDateRequested(startDate, endDate);
 }
 
 void ReportWidget::onRefreshClicked()
@@ -156,69 +143,11 @@ void ReportWidget::onRefreshClicked()
     emit refreshRequested();
 }
 
-void ReportWidget::onExportExcel()
-{
-    QDateTime startDate = m_startDateEdit->dateTime();
-    QDateTime endDate = m_endDateEdit->dateTime();
-    emit exportReportRequested("excel", startDate, endDate);
-}
-
-void ReportWidget::onExportPdf()
-{
-    QDateTime startDate = m_startDateEdit->dateTime();
-    QDateTime endDate = m_endDateEdit->dateTime();
-    emit exportReportRequested("pdf", startDate, endDate);
-}
-
-void ReportWidget::onTabChanged(int index)
-{
-    Q_UNUSED(index)
-    // 切换标签页时刷新对应数据
-    emit refreshRequested();
-}
-
-// ========== 后端调用的槽 ==========
-
 void ReportWidget::onSalesSummaryLoaded(double totalSales, double totalProfit, int orderCount)
 {
     m_totalSalesLabel->setText(QString("¥%1").arg(totalSales, 0, 'f', 2));
     m_totalProfitLabel->setText(QString("¥%1").arg(totalProfit, 0, 'f', 2));
     m_orderCountLabel->setText(QString::number(orderCount));
-}
-
-void ReportWidget::onDailySalesLoaded(const QList<QPair<QString, double>>& dailySales)
-{
-    m_dailySalesTable->setRowCount(dailySales.size());
-    for (int i = 0; i < dailySales.size(); i++) {
-        m_dailySalesTable->setItem(i, 0, new QTableWidgetItem(dailySales[i].first));
-        m_dailySalesTable->setItem(i, 1, new QTableWidgetItem(QString("¥%1").arg(dailySales[i].second, 0, 'f', 2)));
-    }
-}
-
-void ReportWidget::onTopProductsLoaded(const QList<QVariantMap>& topProducts)
-{
-    m_topProductsTable->setRowCount(topProducts.size());
-    for (int i = 0; i < topProducts.size(); i++) {
-        const QVariantMap& product = topProducts[i];
-        m_topProductsTable->setItem(i, 0, new QTableWidgetItem(QString::number(i + 1)));
-        m_topProductsTable->setItem(i, 1, new QTableWidgetItem(product["name"].toString()));
-        m_topProductsTable->setItem(i, 2, new QTableWidgetItem(QString::number(product["totalQuantity"].toInt())));
-        m_topProductsTable->setItem(i, 3, new QTableWidgetItem(QString("¥%1").arg(product["totalAmount"].toDouble(), 0, 'f', 2)));
-    }
-}
-
-void ReportWidget::onSalesOrdersLoaded(const QList<QVariantMap>& orders)
-{
-    m_ordersTable->setRowCount(orders.size());
-    for (int i = 0; i < orders.size(); i++) {
-        const QVariantMap& order = orders[i];
-        m_ordersTable->setItem(i, 0, new QTableWidgetItem(QString::number(order["id"].toInt())));
-        m_ordersTable->setItem(i, 1, new QTableWidgetItem(order["username"].toString()));
-        m_ordersTable->setItem(i, 2, new QTableWidgetItem(QString("¥%1").arg(order["totalAmount"].toDouble(), 0, 'f', 2)));
-        m_ordersTable->setItem(i, 3, new QTableWidgetItem(order["status"].toString()));
-        m_ordersTable->setItem(i, 4, new QTableWidgetItem(order["createdAt"].toString()));
-        m_ordersTable->setItem(i, 5, new QTableWidgetItem(order["remark"].toString()));
-    }
 }
 
 void ReportWidget::onOperationError(const QString& error)

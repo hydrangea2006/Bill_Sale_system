@@ -17,15 +17,9 @@ DeductWidget::DeductWidget(int userId, int mode, QWidget *parent)
     : QWidget(parent)
     , m_userId(userId)
     , m_mode(mode)
-    , m_currentBalance(0)
     , m_currentTotal(0)
 {
     setupUI(mode);
-    if (mode == 0) {
-        emit loadCheckoutDataRequested();
-    } else {
-        emit refreshRequested();
-    }
 }
 
 DeductWidget::~DeductWidget()
@@ -41,7 +35,7 @@ void DeductWidget::setupUI(int mode)
     }
 }
 
-// ========== 用户结算界面 ==========
+// ========== 用户结算界面（去余额干净版） ==========
 void DeductWidget::setupCheckoutUI()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -93,7 +87,7 @@ void DeductWidget::setupCheckoutUI()
     addressLayout->addStretch();
     mainLayout->addLayout(addressLayout);
 
-    // 金额和余额
+    // 金额看板组件（移除我的余额，只留总额）
     QWidget* infoWidget = new QWidget(this);
     infoWidget->setStyleSheet("QWidget { background-color: #F5F7FA; border-radius: 8px; }");
     QVBoxLayout* infoLayout = new QVBoxLayout(infoWidget);
@@ -105,10 +99,10 @@ void DeductWidget::setupCheckoutUI()
     m_balanceLabel->setStyleSheet("QLabel { font-size: 16px; color: #606266; }");
 
     infoLayout->addWidget(m_totalLabel);
-    infoLayout->addWidget(m_balanceLabel);
+
     mainLayout->addWidget(infoWidget);
 
-    // 按钮
+    // 确认按钮布局
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->addStretch();
     m_submitBtn = new QPushButton("Confirm Order", this);
@@ -123,7 +117,7 @@ void DeductWidget::setupCheckoutUI()
     connect(m_refreshAddressBtn, &QPushButton::clicked, this, &DeductWidget::onRefreshAddresses);
 }
 
-// ========== 管理员出库界面 ==========
+// ========== 管理员出库界面（完全保留核心数据看板） ==========
 void DeductWidget::setupAdminUI()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -231,44 +225,37 @@ void DeductWidget::showAddressDialog()
     form->setSpacing(12);
     form->setLabelAlignment(Qt::AlignRight);
 
-    // 收货人
     QLineEdit* nameEdit = new QLineEdit(&dialog);
     nameEdit->setPlaceholderText("Please enter consignee name");
     nameEdit->setMinimumHeight(36);
     form->addRow("Consignee:", nameEdit);
 
-    // 手机号
     QLineEdit* phoneEdit = new QLineEdit(&dialog);
     phoneEdit->setPlaceholderText("Please enter phone number");
     phoneEdit->setMinimumHeight(36);
     form->addRow("Phone Number:", phoneEdit);
 
-    // 省份
     QComboBox* provinceCombo = new QComboBox(&dialog);
     provinceCombo->setEditable(true);
     provinceCombo->addItems({"Beijing", "Shanghai", "Guangdong", "Jiangsu", "Zhejiang", "Sichuan", "Hubei", "Hunan", "Fujian", "Shandong", "Henan", "Hebei", "Anhui", "Shaanxi", "Chongqing"});
     provinceCombo->setMinimumHeight(36);
     form->addRow("Province:", provinceCombo);
 
-    // 城市
     QComboBox* cityCombo = new QComboBox(&dialog);
     cityCombo->setEditable(true);
     cityCombo->setMinimumHeight(36);
     form->addRow("City:", cityCombo);
 
-    // 区/县
     QComboBox* districtCombo = new QComboBox(&dialog);
     districtCombo->setEditable(true);
     districtCombo->setMinimumHeight(36);
     form->addRow("District:", districtCombo);
 
-    // 详细地址
     QTextEdit* detailEdit = new QTextEdit(&dialog);
     detailEdit->setPlaceholderText("Please enter detailed address (street, community, house number)");
     detailEdit->setFixedHeight(80);
     form->addRow("Detailed Address:", detailEdit);
 
-    // 设为默认
     QComboBox* isDefaultCombo = new QComboBox(&dialog);
     isDefaultCombo->addItems({"No", "Yes"});
     isDefaultCombo->setMinimumHeight(36);
@@ -276,7 +263,6 @@ void DeductWidget::showAddressDialog()
 
     dialogLayout->addLayout(form);
 
-    // 按钮
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->setSpacing(15);
     QPushButton* submitBtn = new QPushButton("Confirm Add", &dialog);
@@ -328,7 +314,7 @@ void DeductWidget::showAddressDialog()
     dialog.exec();
 }
 
-// ========== 用户结算槽 ==========
+// ========== 用户结算槽（删除了所有余额判断防护） ==========
 void DeductWidget::onSubmitClicked()
 {
     if (m_addressCombo->currentData().isNull()) {
@@ -361,20 +347,16 @@ void DeductWidget::onCartItemsLoaded(const QList<QVariantMap>& items, double tot
     for (int i = 0; i < items.size(); i++) {
         const QVariantMap& item = items[i];
         double subtotal = item["quantity"].toInt() * item["price"].toDouble();
-        m_tableWidget->setItem(i, 0, new QTableWidgetItem(item["name"].toString()));
+        m_tableWidget->setItem(i, 0, new QTableWidgetItem(item["productName"].toString()));
         m_tableWidget->setItem(i, 1, new QTableWidgetItem(QString("¥%1").arg(item["price"].toDouble(), 0, 'f', 2)));
         m_tableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(item["quantity"].toInt())));
         m_tableWidget->setItem(i, 3, new QTableWidgetItem(QString("¥%1").arg(subtotal, 0, 'f', 2)));
     }
     m_totalLabel->setText(QString("Order Total: ¥%1").arg(total, 0, 'f', 2));
 
-    if (m_currentBalance < total && total > 0) {
-        m_submitBtn->setEnabled(false);
-        m_submitBtn->setStyleSheet("QPushButton { background-color: #C0C4CC; color: white; border-radius: 4px; font-size: 14px; }");
-    } else {
-        m_submitBtn->setEnabled(true);
-        m_submitBtn->setStyleSheet("QPushButton { background-color: #67C23A; color: white; border-radius: 4px; font-size: 14px; }");
-    }
+    // 只要有商品就开启下单功能，不再管账户内有没有余额
+    m_submitBtn->setEnabled(true);
+    m_submitBtn->setStyleSheet("QPushButton { background-color: #67C23A; color: white; border-radius: 4px; font-size: 14px; }");
 }
 
 void DeductWidget::onAddressesLoaded(const QList<QVariantMap>& addresses)
@@ -382,7 +364,7 @@ void DeductWidget::onAddressesLoaded(const QList<QVariantMap>& addresses)
     m_addressCombo->clear();
     for (const auto& addr : addresses) {
         QString fullAddr = QString("%1 %2 %3 %4")
-        .arg(addr["province"].toString())
+            .arg(addr["province"].toString())
             .arg(addr["city"].toString())
             .arg(addr["district"].toString())
             .arg(addr["detail"].toString());

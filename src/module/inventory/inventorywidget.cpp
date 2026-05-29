@@ -16,7 +16,6 @@ InventoryWidget::InventoryWidget(int userId, int role, QWidget *parent)
     , m_role(role)
 {
     setupUI(role);
-    loadSampleData();
 }
 
 InventoryWidget::~InventoryWidget()
