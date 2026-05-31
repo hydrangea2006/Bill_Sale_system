@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>余额</string>
+   <string>balance</string>
   </property>
  </widget>
  <resources/>
