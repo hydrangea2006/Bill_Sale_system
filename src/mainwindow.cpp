@@ -1,20 +1,20 @@
 /**
  * @file mainwindow.cpp
- * @brief 密码重置窗口实现：负责找回密码流程的交互与反馈
+ * @brief Password Reset Window Implementation: Handles password recovery interaction and feedback
  */
 
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QMessageBox>
 
-// 构造函数：初始化 UI 并统一设置输入框文字颜色（覆盖深色主题）
+// Constructor: Initialize UI and set input text color (override dark theme)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    // 将输入框的文字颜色强制设为黑色，确保在不同主题下清晰可见
+    // Force text color to black for clear visibility in all themes
     QPalette pal = ui->edit_account->palette();
     pal.setColor(QPalette::Text, Qt::black);
     ui->edit_account->setPalette(pal);
@@ -23,56 +23,56 @@ MainWindow::MainWindow(QWidget *parent)
     ui->edit_confirmPwd->setPalette(pal);
 }
 
-// 析构函数：自动释放 UI 对象资源
+// Destructor: Auto release UI resources
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-// ========== 后端调用的公共槽函数 (Controller 反馈接口) ==========
+// ========== Public Slots for Backend Calls (Controller Feedback Interface) ==========
 
-// 接收控制器发来的重置失败信息
+// Receive reset failure message from controller
 void MainWindow::showResetError(const QString &message)
 {
-    QMessageBox::warning(this, "重置失败", message);
+    QMessageBox::warning(this, "Reset Failed", message);
 }
 
-// 接收控制器发来的重置成功信息
+// Receive reset success message from controller
 void MainWindow::showResetSuccess(const QString &message)
 {
-    QMessageBox::information(this, "重置成功", message);
-    emit closed(); // 通知登录窗口流程结束
+    QMessageBox::information(this, "Reset Success", message);
+    emit closed(); // Notify login window process finished
     this->close();
 }
 
-// ========== 界面交互逻辑 ==========
+// ========== UI Interaction Logic ==========
 
-// 返回登录：关闭当前窗口并通知上层
+// Back to Login: Close current window and notify parent
 void MainWindow::on_btn_back_clicked()
 {
     emit closed();
     this->close();
 }
 
-// 获取验证码逻辑
+// Get Verification Code Logic
 void MainWindow::on_btn_getCode_clicked()
 {
     QString account = ui->edit_account->text().trimmed();
 
-    // 空值校验
+    // Empty check
     if (account.isEmpty()) {
-        QMessageBox::warning(this, "提示", "请输入账号/手机号");
+        QMessageBox::warning(this, "Tip", "Please enter account/phone number");
         return;
     }
 
-    // 关键点：发射信号给 Controller。界面不负责逻辑，只负责请求
-    qDebug() << ">>> [DEBUG] 正在发射请求验证码信号，账号:" << account;
+    // Key point: Emit signal to Controller. UI only handles requests, not logic
+    qDebug() << ">>> [DEBUG] Emitting verification code request, account:" << account;
     emit requestVerificationCode(account);
 
-    QMessageBox::information(this, "提示", "已发送验证码请求，请稍候...");
+    QMessageBox::information(this, "Tip", "Verification code request sent, please wait...");
 }
 
-// 提交重置密码逻辑
+// Submit Reset Password Logic
 void MainWindow::on_btn_submit_clicked()
 {
     QString account = ui->edit_account->text().trimmed();
@@ -80,25 +80,25 @@ void MainWindow::on_btn_submit_clicked()
     QString newPwd = ui->edit_newPwd->text();
     QString confirmPwd = ui->edit_confirmPwd->text();
 
-    // 前端基础校验：检查输入完整性
+    // Frontend validation: Check complete input
     if (account.isEmpty() || code.isEmpty() || newPwd.isEmpty() || confirmPwd.isEmpty()) {
-        QMessageBox::warning(this, "提示", "请填写完整信息");
+        QMessageBox::warning(this, "Tip", "Please fill in all information");
         return;
     }
-    // 密码一致性二次核对
+    // Check password consistency
     if (newPwd != confirmPwd) {
-        QMessageBox::warning(this, "提示", "两次输入的密码不一致");
+        QMessageBox::warning(this, "Tip", "Passwords do not match");
         return;
     }
 
-    // 关键点：将数据包发送给 Controller 进行数据库层面的重置
-    qDebug() << ">>> [DEBUG] 正在发射重置密码信号...";
+    // Key point: Send data to Controller for database reset
+    qDebug() << ">>> [DEBUG] Emitting password reset signal...";
     emit resetPasswordRequested(account, code, newPwd, confirmPwd);
 }
 
-// ========== 输入限制逻辑 ==========
+// ========== Input Restriction Logic ==========
 
-// 限制账号输入长度为 11 位（常见手机号长度）
+// Limit account input to 11 digits (common phone length)
 void MainWindow::on_edit_account_textChanged(const QString &text)
 {
     if (text.length() > 11) {
@@ -106,7 +106,7 @@ void MainWindow::on_edit_account_textChanged(const QString &text)
     }
 }
 
-// 限制验证码只能输入数字
+// Limit verification code to numbers only
 void MainWindow::on_edit_code_textChanged(const QString &text)
 {
     if (!text.isEmpty() && !text.back().isDigit()) {
@@ -114,12 +114,12 @@ void MainWindow::on_edit_code_textChanged(const QString &text)
     }
 }
 
-// 实时校验：动态监测密码一致性，并给出视觉提示
+// Real-time check: Monitor password consistency and show visual tips
 void MainWindow::on_edit_newPwd_textChanged(const QString &text)
 {
     if (!ui->edit_confirmPwd->text().isEmpty()) {
         if (text != ui->edit_confirmPwd->text()) {
-            ui->label_tip->setText("两次密码不一致");
+            ui->label_tip->setText("Passwords do not match");
         } else {
             ui->label_tip->clear();
         }
@@ -129,7 +129,7 @@ void MainWindow::on_edit_newPwd_textChanged(const QString &text)
 void MainWindow::on_edit_confirmPwd_textChanged(const QString &text)
 {
     if (text != ui->edit_newPwd->text()) {
-        ui->label_tip->setText("两次密码不一致");
+        ui->label_tip->setText("Passwords do not match");
     } else {
         ui->label_tip->clear();
     }
